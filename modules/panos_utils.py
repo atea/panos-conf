@@ -37,7 +37,7 @@ class PanosUtils:
       self.get_objects(conn)
   
   def get_objects(self, conn):
-    object_types = self.utils.config['api_parameters']['objects']
+    object_types = self.utils.api_params['objects']
     for obj_type in object_types:
       if object_types[obj_type]['skip']:
         continue

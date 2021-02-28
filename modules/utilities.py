@@ -30,6 +30,8 @@ class Utilities:
     self.start = self.datetime_now()
     self.config = self.yaml_from_file(
         self.get_filepath('/configs/panos-conf.yml'))
+    self.api_params = self.yaml_from_file(
+        self.get_filepath('/configs/panos-api-parameters.yml'))
     self.log = self.create_logger()
 
   def get_work_dir(self):
