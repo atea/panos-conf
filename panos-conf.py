@@ -3,7 +3,6 @@
 import argparse
 import os
 import sys
-import time
 from modules.panos_utils import PanosUtils
 from modules.utilities import Utilities
 
