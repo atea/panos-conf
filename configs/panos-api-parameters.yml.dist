@@ -1,7 +1,9 @@
 objects:
   address_group:
+    module: panos.objects
     class: AddressGroup
     skip: false
+    sort_param: name
     params: 
       - name                      # (str) - Name of the address group
       - static_value              # (list) - Values for a static address group
@@ -9,8 +11,10 @@ objects:
       - description               # (str) - Description of this object
       - tag                       # (list) - Administrative tags (not to be confused with registered-ip tags)
   address_object:
+    module: panos.objects
     class: AddressObject
     skip: false
+    sort_param: name
     params:
       - name                      # (str) - Name of the object
       - value                     # (str) - IP address or other value of the object
@@ -18,13 +22,17 @@ objects:
       - description               # (str) - Description of this object
       - tag                       # (list) - Administrative tags
   application_container:
+    module: panos.objects
     class: ApplicationContainer
     skip: true
+    sort_param: applications
     params:
       - applications              # (list) - List of memeber applications
   application_filter:
+    module: panos.objects
     class: ApplicationFilter
     skip: true
+    sort_param: name
     params:
       - name                      # (str) - Name of the object
       - category                  # (list) – Application category
@@ -42,15 +50,19 @@ objects:
       - pervasive                 # (bool) –
       - tag                       # (list) – Administrative tags
   application_group:
+    module: panos.objects
     class: ApplicationGroup
     skip: false
+    sort_param: name
     params:
       - name                      # (str) – Name of the object
       - value                     # (list) – List of application values
       - tag                       # (list) – Administrative tags
   application_object:
+    module: panos.objects
     class: ApplicationObject
     skip: true
+    sort_param: name
     params:
       - name                      # (str) – Name of the object
       - category                  # (str) – Application category
@@ -80,30 +92,38 @@ objects:
       - description               # (str) – Description of this object
       - tag                       # (list) – Administrative tags
   custom_url_category:
+    module: panos.objects
     class: CustomUrlCategory
     skip: true
+    sort_param: name
     params:
       - name                      # (str) – The name
       - url_value                 # (list) – Values to include in custom URL category object
       - description               # (str) – Description of this object
   dynamic_user_group:
+    module: panos.objects
     class: DynamicUserGroup
     skip: true
+    sort_param: name
     params:
       - name                      # (str) – Name of the dynamic user group
       - description               # (str) – Description of this object
       - filter                    # (str) – Tag-based filter.
       - tag                       # (list) – Administrative tags
   log_forwarding_profile:
+    module: panos.objects
     class: LogForwardingProfile
     skip: true
+    sort_param: name
     params:
       - name                      # (str) – The name
       - description               # (str) – The description
       - enhanced_logging          # (bool) – (PAN-OS 8.1+) Enabling enhanced application logging
   log_forwarding_profile_match_list:
+    module: panos.objects
     class: LogForwardingProfileMatchList
     skip: true
+    sort_param: name
     params:
       - name                      # (str) – The name
       - description               # (str) – Description
@@ -115,8 +135,10 @@ objects:
       - syslog_profiles           # (str/list) – List of SyslogServerProfiles.
       - http_profiles             # (str/list) – List of HttpServerProfiles.
   log_forwarding_profile_match_list_action:
+    module: panos.objects
     class: LogForwardingProfileMatchListAction
     skip: true
+    sort_param: name
     params:
       - name                      # (str) – The name
       - action_type               # (str) – Action type. Valid values are tagging (default) or (PAN-OS 8.1+) integration.
@@ -127,16 +149,20 @@ objects:
       - tags                      # (str/list) – List of administrative tags.
       - timeout                   # (int) – (PAN-OS 9.0+) Timeout in minutes
   region:
+    module: panos.objects
     class: Region
     skip: true
+    sort_param: name
     params:
       - name                      # (str) – Name of the region
       - address                   # (list) – List of IP networks
       - latitude                  # (float) – Latitude of the region
       - longitude                 # (float) – Longitude of the region
   schedule_object:
+    module: panos.objects
     class: ScheduleObject
     skip: true
+    sort_param: name
     params:
       - name                      # (str) – Name of the object
       - disable_override          # (bool) – “True” to set disable-override
@@ -152,8 +178,10 @@ objects:
       - weekly_friday_time        # (list/str) – “Time Range” for a weekly recurring schedule (Friday)
       - weekly_saturday_time      # (list/str) – “Time Range” for a weekly recurring schedule (Saturday)
   security_profile_group:
+    module: panos.objects
     class: SecurityProfileGroup
     skip: false
+    sort_param: name
     params:
       - name                      # (str) – The group name
       - virus                     # (str) – Antivirus profile
@@ -164,15 +192,19 @@ objects:
       - data_filtering            # (str) – Data filtering profile
       - wildfire_analysis         # (str) – WildFire analysis profile
   service_group:
+    module: panos.objects
     class: ServiceGroup
     skip: false
+    sort_param: name
     params:
       - name                      # (str) – Name of the object
       - value                     # (list) – List of service values
       - tag                       # (list) – Administrative tags
   service_object:
+    module: panos.objects
     class: ServiceObject
     skip: false
+    sort_param: name
     params:
       - name                      # (str) – Name of the object
       - protocol                  # (str) – Protocol of the service, either tcp or udp
@@ -181,8 +213,10 @@ objects:
       - description               # (str) – Description of this object
       - tag                       # (list) – Administrative tags
   tag:
+    module: panos.objects
     class: Tag
     skip: false
+    sort_param: name
     params:
       - name                      # (str) – Name of the tag
       - color                     # (str) – Color ID (eg. ‘color1’, ‘color4’, etc). You can use color_code() to generate the ID.

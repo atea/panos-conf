@@ -233,8 +233,8 @@ class Utilities:
     else:
       return self.get_api_key_keyring()
 
-  def write_config_file(self, file_params, yaml_flow=False):
+  def write_config_file(self, data, file_params, yaml_flow=False):
     conf_dir = self.create_config_folder(file_params['hostname'])
     conf_file = conf_dir + '/' + file_params['filename'] + '.yml'
-    self.yaml_to_file(conf_file, file_params['data'], 
+    self.yaml_to_file(conf_file, data,
                       file_params['force_overwrite'], yaml_flow)

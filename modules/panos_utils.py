@@ -27,43 +27,56 @@ class PanosUtils:
       conn = {
         "hostname": hostname,
         "args": args,
-        "force_overwrite": force_overwrite
+        "add": False
       }
       fw = self.connect_to_fw(conn)
       if fw is None:
         continue
-
       conn['fw'] = fw
-      self.get_objects(conn)
+
+      fw_config = self.get_fw_config_all(conn)
+
+      for config_type in fw_config:
+        for subconfig in fw_config[config_type]:
+          file_params = {
+            "filename": config_type + '_' + subconfig,
+            "force_overwrite": force_overwrite,
+            "hostname": hostname
+          }
+          self.utils.write_config_file(fw_config[config_type][subconfig],
+                                       file_params)
+
+  def get_fw_config_all(self, conn):
+    config_types = self.utils.api_params
+    fw_config = {}
+    for config_type in config_types:
+      fw_config[config_type] = self.get_fw_config(conn,
+                                                  config_types[config_type])
+    return fw_config
   
-  def get_objects(self, conn):
-    object_types = self.utils.api_params['objects']
-    for obj_type in object_types:
-      if object_types[obj_type]['skip']:
+  def get_fw_config(self, conn, configs):
+    fw_config = {}
+    for config_type in configs:
+      if configs[config_type]['skip']:
         continue
 
-      obj_type_info = object_types[obj_type]
-      obj_type_class = self.utils.class_for_name('panos.objects', 
-                                                 obj_type_info['class'])
-      data = self.get_objects_from_fw(conn, obj_type_info, obj_type_class)
-      file_params = {
-        "data": data,
-        "filename": 'objects_' + obj_type,
-        "force_overwrite": conn['force_overwrite'],
-        "hostname": conn['hostname']
-      }
-      self.utils.write_config_file(file_params)
+      config_info = configs[config_type]
+      config_class = self.utils.class_for_name(config_info['module'],
+                                               config_info['class'])
+      data = self.get_config_from_fw(conn, config_info, config_class)
+      fw_config[config_type] = data
+    return fw_config
       
-  def get_objects_from_fw(self, conn, obj_type_info, obj_type_class):
-    fw_objects = obj_type_class.refreshall(conn['fw'], add=False)
+  def get_config_from_fw(self, conn, config_info, config_class):
+    class_config = config_class.refreshall(conn['fw'], conn['add'])
     
-    objects = []
-    for obj in fw_objects:
+    data = []
+    for obj in class_config:
       obj_info = {}
-      for param in obj_type_info['params']:
+      for param in config_info['params']:
         obj_param = getattr(obj, param)
         if (obj_param is not None or
             not self.utils.config['settings']['skip_null_param']):
           obj_info[param] = obj_param
-      objects.append(dict(obj_info))
-    return sorted(objects, key=lambda k: k['name'])
+      data.append(dict(obj_info))
+    return sorted(data, key=lambda k: k[config_info['sort_param']])
