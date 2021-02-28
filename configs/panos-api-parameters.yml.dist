@@ -1,7 +1,11 @@
+###############################################################################
+################################### OBJECTS ###################################
+###############################################################################
 objects:
   address_group:
     module: panos.objects
     class: AddressGroup
+    parent: fw
     skip: false
     sort_param: name
     params: 
@@ -13,6 +17,7 @@ objects:
   address_object:
     module: panos.objects
     class: AddressObject
+    parent: fw
     skip: false
     sort_param: name
     params:
@@ -24,6 +29,7 @@ objects:
   application_container:
     module: panos.objects
     class: ApplicationContainer
+    parent: fw
     skip: true
     sort_param: applications
     params:
@@ -31,6 +37,7 @@ objects:
   application_filter:
     module: panos.objects
     class: ApplicationFilter
+    parent: fw
     skip: true
     sort_param: name
     params:
@@ -52,6 +59,7 @@ objects:
   application_group:
     module: panos.objects
     class: ApplicationGroup
+    parent: fw
     skip: false
     sort_param: name
     params:
@@ -61,6 +69,7 @@ objects:
   application_object:
     module: panos.objects
     class: ApplicationObject
+    parent: fw
     skip: true
     sort_param: name
     params:
@@ -94,6 +103,7 @@ objects:
   custom_url_category:
     module: panos.objects
     class: CustomUrlCategory
+    parent: fw
     skip: true
     sort_param: name
     params:
@@ -103,6 +113,7 @@ objects:
   dynamic_user_group:
     module: panos.objects
     class: DynamicUserGroup
+    parent: fw
     skip: true
     sort_param: name
     params:
@@ -113,6 +124,7 @@ objects:
   log_forwarding_profile:
     module: panos.objects
     class: LogForwardingProfile
+    parent: fw
     skip: true
     sort_param: name
     params:
@@ -122,6 +134,7 @@ objects:
   log_forwarding_profile_match_list:
     module: panos.objects
     class: LogForwardingProfileMatchList
+    parent: fw
     skip: true
     sort_param: name
     params:
@@ -137,6 +150,7 @@ objects:
   log_forwarding_profile_match_list_action:
     module: panos.objects
     class: LogForwardingProfileMatchListAction
+    parent: fw
     skip: true
     sort_param: name
     params:
@@ -151,6 +165,7 @@ objects:
   region:
     module: panos.objects
     class: Region
+    parent: fw
     skip: true
     sort_param: name
     params:
@@ -161,6 +176,7 @@ objects:
   schedule_object:
     module: panos.objects
     class: ScheduleObject
+    parent: fw
     skip: true
     sort_param: name
     params:
@@ -180,6 +196,7 @@ objects:
   security_profile_group:
     module: panos.objects
     class: SecurityProfileGroup
+    parent: fw
     skip: false
     sort_param: name
     params:
@@ -194,6 +211,7 @@ objects:
   service_group:
     module: panos.objects
     class: ServiceGroup
+    parent: fw
     skip: false
     sort_param: name
     params:
@@ -203,6 +221,7 @@ objects:
   service_object:
     module: panos.objects
     class: ServiceObject
+    parent: fw
     skip: false
     sort_param: name
     params:
@@ -215,6 +234,7 @@ objects:
   tag:
     module: panos.objects
     class: Tag
+    parent: fw
     skip: false
     sort_param: name
     params:
@@ -233,3 +253,119 @@ objects:
     # "lavender": 33, "orchid": 34, "thistle": 35, "peach": 36, "salmon": 37,
     # "magenta": 38, "red violet": 39, "mahogany": 40, "burnt sienna": 41,
     # "chestnut": 42,
+
+###############################################################################
+################################## POLICIES  ##################################
+###############################################################################
+policies:
+  nat_rule:
+    module: panos.policies
+    class: NatRule
+    parent: rulebase
+    skip: false
+    sort_param: name
+    params:
+      - name                                              # (str) – Name of the rule
+      - description                                       # (str) – The description
+      - nat_type                                          # (str) – Type of NAT
+      - fromzone                                          # (list) – From zones
+      - tozone                                            # (list) – To zones
+      - to_interface                                      # (str) – Egress interface from route lookup
+      - service                                           # (str) – The service
+      - source                                            # (list) – Source addresses
+      - destination                                       # (list) – Destination addresses
+      - source_translation_type                           # (str) – Type of source address translation
+      - source_translation_address_type                   # (str) – Address type for Dynamic IP And Port or Dynamic IP source translation types
+      - source_translation_interface                      # (str) – Interface of the source address translation for Dynamic IP and Port source translation types
+      - source_translation_ip_address                     # (str) – IP address of the source address translation for Dynamic IP and Port source translation types
+      - source_translation_translated_addresses           # (list) – Translated addresses of the source address translation for Dynamic IP And Port or Dynamic IP source translation types
+      - source_translation_fallback_type                  # (str) – Type of fallback for Dynamic IP source translation types
+      - source_translation_fallback_translated_addresses  # (list) – Addresses for translated address types of fallback source translation
+      - source_translation_fallback_interface             # (str) – The interface for the fallback source translation
+      - source_translation_fallback_ip_type               # (str) – The type of the IP address for the fallback source translation IP address
+      - source_translation_fallback_ip_address            # (str) – The IP address of the fallback source translation
+      - source_translation_static_translated_address      # (str) – The IP address for the static source translation
+      - source_translation_static_bi_directional          #(bool) – Allow reverse translation from translated address to original address
+      - destination_translated_address                    # (str) – Translated destination IP address
+      - destination_translated_port                       # (int) – Translated destination port number
+      - ha_binding                                        # (str) – Device binding configuration in HA Active-Active mode
+      - disabled                                          # (bool) – Disable this rule
+      - negate_target                                     # (bool) – Target all but the listed target firewalls (applies to panorama/device groups only)
+      - target                                            # (list) – Apply this policy to the listed firewalls only (applies to panorama/device groups only)
+      - tag                                               # (list) – Administrative tags
+      - uuid                                              # (str) – (PAN-OS 9.0+) The UUID for this rule.
+  policy_based_forwarding:
+    module: panos.policies
+    class: PolicyBasedForwarding
+    parent: rulebase
+    skip: false
+    sort_param: name
+    params:
+      - name                                              # (str) – The name
+      - description                                       # (str) – The descripton
+      - tags                                              # (str/list) – List of tags
+      - from_type                                         # (str) – Source from type. Valid values are ‘zone’ (default) or ‘interface’.
+      - from_values                                       # (str/list) – The source values for the given type.
+      - source_addresses                                  # (str/list) – List of source IP addresses.
+      - source_users                                      # (str/list) – List of source users.
+      - negate_source                                     # (bool) – Set to negate the source.
+      - destination_addresses                             # (str/list) – List of destination addresses.
+      - negate_destination                                # (bool) – Set to negate the destination.
+      - applications                                      # (str/list) – List of applications.
+      - services                                          # (str/list) – List of services.
+      - schedule                                          # (str) – The schedule.
+      - disabled                                          # (bool) – Set to disable this rule.
+      - action                                            # (str) – The action to take. Valid values are ‘forward’ (default), ‘forward-to-vsys’, ‘discard’, or ‘no-pbf’.
+      - forward_vsys                                      # (str) – The vsys to forward to if action is set to forward to a vsys.
+      - forward_egress_interface                          # (str) – The egress interface.
+      - forward_next_hop_type                             # (str) – The next hop type. Valid values are ‘ip-address’, ‘fqdn’, or None (default).
+      - forward_next_hop_value                            # (str) – The next hop value if the forward next hop type is not None.
+      - forward_monitor_profile                           # (str) – The monitor profile to use.
+      - forward_monitor_ip_address                        # (str) – The monitor IP address.
+      - forward_monitor_disable_if_unreachable            # (bool) – Set to disable this rule if nexthop / monitor IP is unreachable.
+      - enable_enforce_symmetric_return                   # (bool) – Set to enforce symmetric return.
+      - symmetric_return_addresses                        # (str/list) – List of symmetric return addresses.
+      - target                                            # (list) – Apply this policy to the listed firewalls only (applies to panorama/device groups only)
+      - negate_target                                     # (bool) – Target all but the listed target firewalls (applies to panorama/device groups only)
+      - uuid                                              # (str) – (PAN-OS 9.0+) The UUID for this rule.
+  security_rule:
+    module: panos.policies
+    class: SecurityRule
+    parent: rulebase
+    skip: false
+    sort_param: name
+    params:
+      - name                                              # (str) – Name of the rule
+      - fromzone                                          # (list) – From zones
+      - tozone                                            # (list) – To zones
+      - source                                            # (list) – Source addresses
+      - source_user                                       # (list) – Source users and groups
+      - hip_profiles                                      # (list) – GlobalProtect host integrity profiles
+      - destination                                       # (list) – Destination addresses
+      - application                                       # (list) – Applications
+      - service                                           # (list) – Destination services (ports) (Default: application-default)
+      - category                                          # (list) – Destination URL Categories
+      - action                                            # (str) – Action to take (deny, allow, drop, reset-client, reset-server, reset-both) Note: Not all options are available on all PAN-OS versions.
+      - log_setting                                       # (str) – Log forwarding profile
+      - log_start                                         # (bool) – Log at session start
+      - log_end                                           # (bool) – Log at session end
+      - description                                       # (str) – Description of this rule
+      - type                                              # (str) – ‘universal’, ‘intrazone’, or ‘intrazone’ (Default: universal)
+      - tag                                               # (list) – Administrative tags
+      - negate_source                                     # (bool) – Match on the reverse of the ‘source’ attribute
+      - negate_destination                                # (bool) – Match on the reverse of the ‘destination’ attribute
+      - disabled                                          # (bool) – Disable this rule
+      - schedule                                          # (str) – Schedule Profile
+      - icmp_unreachable                                  # (bool) – Send ICMP Unreachable
+      - disable_server_response_inspection                # (bool) – Disable server response inspection
+      - group                                             # (str) – Security Profile Group
+      - virus                                             # (str) – Antivirus Security Profile
+      - spyware                                           # (str) – Anti-Spyware Security Profile
+      - vulnerability                                     # (str) – Vulnerability Protection Security Profile
+      - url_filtering                                     # (str) – URL Filtering Security Profile
+      - file_blocking                                     # (str) – File Blocking Security Profile
+      - wildfire_analysis                                 # (str) – Wildfire Analysis Security Profile
+      - data_filtering                                    # (str) – Data Filtering Security Profile
+      - negate_target                                     # (bool) – Target all but the listed target firewalls (applies to panorama/device groups only)
+      - target                                            # (list) – Apply this policy to the listed firewalls only (applies to panorama/device groups only)
+      - uuid                                              # (str) – (PAN-OS 9.0+) The UUID for this rule.
