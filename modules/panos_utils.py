@@ -96,5 +96,9 @@ class PanosUtils:
               not self.utils.config['settings']['skip_null_param']):
             obj_info[param] = obj_param
         data.append(dict(obj_info))
-      return sorted(data, key=lambda k: k[config_info['sort_param']])
       
+      if config_info['sort_param'] is None:
+        # we don't sort these, as order matters
+        return data
+      else:
+        return sorted(data, key=lambda k: k[config_info['sort_param']])

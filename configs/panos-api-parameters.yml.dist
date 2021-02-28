@@ -31,7 +31,7 @@ objects:
     class: ApplicationContainer
     parent: fw
     skip: true
-    sort_param: applications
+    sort_param: null
     params:
       - applications              # (list) - List of memeber applications
   application_filter:
@@ -263,7 +263,7 @@ policies:
     class: NatRule
     parent: rulebase
     skip: false
-    sort_param: name
+    sort_param: null # don't sort, order matters
     params:
       - name                                              # (str) – Name of the rule
       - description                                       # (str) – The description
@@ -299,7 +299,7 @@ policies:
     class: PolicyBasedForwarding
     parent: rulebase
     skip: false
-    sort_param: name
+    sort_param: null # don't sort, order matters
     params:
       - name                                              # (str) – The name
       - description                                       # (str) – The descripton
@@ -333,7 +333,7 @@ policies:
     class: SecurityRule
     parent: rulebase
     skip: false
-    sort_param: name
+    sort_param: null # don't sort, order matters
     params:
       - name                                              # (str) – Name of the rule
       - fromzone                                          # (list) – From zones
