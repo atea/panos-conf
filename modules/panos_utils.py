@@ -37,12 +37,13 @@ class PanosUtils:
           data = fw_configs[hostname]['config'][config_type][config_child]
           self.utils.write_config_file(data, file_params)
 
-  def get_configs_from_all_firewalls(self):
+  def get_configs_from_all_firewalls(self, return_object=False):
     fw_configs = {}
     for hostname, args in self.utils.config['panos']['hosts'].items():
       conn = {
         "args": args,
-        "add": False
+        "add": False,
+        "return_object": return_object
       }
       fw = self.connect_to_fw(hostname, conn['args'])
       if fw is None:
@@ -51,9 +52,10 @@ class PanosUtils:
       conn['rulebase'] = panos.policies.Rulebase()
       conn['fw'].add(conn['rulebase'])
 
+      fw_config = self.get_config_types_from_firewall(conn)
       fw_configs[hostname] = {}
       fw_configs[hostname]['conn'] = conn
-      fw_configs[hostname]['config'] = self.get_config_types_from_firewall(conn)
+      fw_configs[hostname]['config'] = fw_config
     return fw_configs
 
   def get_config_types_from_firewall(self, conn):
@@ -82,13 +84,17 @@ class PanosUtils:
     class_config = config_class.refreshall(conn[config_info['parent']],
                                            conn['add'])
     
-    data = []
-    for obj in class_config:
-      obj_info = {}
-      for param in config_info['params']:
-        obj_param = getattr(obj, param)
-        if (obj_param is not None or
-            not self.utils.config['settings']['skip_null_param']):
-          obj_info[param] = obj_param
-      data.append(dict(obj_info))
-    return sorted(data, key=lambda k: k[config_info['sort_param']])
+    if conn['return_object']:
+      return class_config
+    else:
+      data = []
+      for obj in class_config:
+        obj_info = {}
+        for param in config_info['params']:
+          obj_param = getattr(obj, param)
+          if (obj_param is not None or
+              not self.utils.config['settings']['skip_null_param']):
+            obj_info[param] = obj_param
+        data.append(dict(obj_info))
+      return sorted(data, key=lambda k: k[config_info['sort_param']])
+      
