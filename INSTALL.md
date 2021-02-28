@@ -4,7 +4,7 @@
 
 1. Clone repository:
 
-        https://github.com/ateanorge/panos-conf.git
+        git clone https://github.com/ateanorge/panos-conf.git
 
 2. Install requirements:
 
