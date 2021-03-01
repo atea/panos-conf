@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 
 import panos
+import panos.device
 import panos.firewall
 import panos.objects
 import panos.policies
@@ -11,11 +12,12 @@ class PanosUtils:
       for key, value in kwargs.items():
         setattr(self, key, value)
     
-  def connect_to_fw(self, hostname, args=None):
+  def connect_to_fw(self, hostname, vsys='vsys1', args=None):
     try:
       fw = panos.firewall.Firewall(
         hostname = hostname,
-        api_key = self.utils.get_api_key(args)
+        api_key = self.utils.get_api_key(args),
+        vsys = vsys
       )
     except:
       self.utils.log.error("Could not connect to firewall.")
@@ -27,35 +29,40 @@ class PanosUtils:
     fw_configs = self.get_configs_from_all_firewalls()
 
     for hostname in fw_configs:
-      for config_type in fw_configs[hostname]['config']:
-        for config_child in fw_configs[hostname]['config'][config_type]:
-          file_params = {
-            "filename": config_type + '_' + config_child,
-            "force_overwrite": force_overwrite,
-            "hostname": hostname
-          }
-          data = fw_configs[hostname]['config'][config_type][config_child]
-          self.utils.write_config_file(data, file_params)
+      for vsys in fw_configs[hostname]:
+        config_types = fw_configs[hostname][vsys]['config']
+        for config_type in config_types:
+          for config_child in config_types[config_type]:
+            file_params = {
+              "conf_dir": f"{ hostname }/{ vsys }",
+              "filename": f"/{ config_type }_{ config_child }",
+              "force_overwrite": force_overwrite
+            }
+            data = config_types[config_type][config_child]
+            self.utils.write_config_file(data, file_params)
 
   def get_configs_from_all_firewalls(self, return_object=False):
     fw_configs = {}
     for hostname, args in self.utils.config['panos']['hosts'].items():
-      conn = {
-        "args": args,
-        "add": False,
-        "return_object": return_object
-      }
-      fw = self.connect_to_fw(hostname, conn['args'])
-      if fw is None:
-        continue
-      conn['fw'] = fw
-      conn['rulebase'] = panos.policies.Rulebase()
-      conn['fw'].add(conn['rulebase'])
+      for vsys in args['vsys']:
+        conn = {
+          "hostname": hostname,
+          "args": args,
+          "add": False,
+          "return_object": return_object
+        }
+        fw = self.connect_to_fw(hostname, vsys, conn['args'])
+        if fw is None:
+          continue
+        conn['fw'] = fw
+        conn['rulebase'] = panos.policies.Rulebase()
+        conn['fw'].add(conn['rulebase'])
 
-      fw_config = self.get_config_types_from_firewall(conn)
-      fw_configs[hostname] = {}
-      fw_configs[hostname]['conn'] = conn
-      fw_configs[hostname]['config'] = fw_config
+        fw_config = self.get_config_types_from_firewall(conn)
+        fw_configs[hostname] = {}
+        fw_configs[hostname][vsys] = {}
+        fw_configs[hostname][vsys]['conn'] = conn
+        fw_configs[hostname][vsys]['config'] = fw_config
     return fw_configs
 
   def get_config_types_from_firewall(self, conn):

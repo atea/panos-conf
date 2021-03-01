@@ -6,6 +6,12 @@ settings:
 
 panos:
   hosts:
-    foo.example.com: ~
+    foo.example.com:
+      vsys:
+        - vsys1
     bar.example.com:
       api_key: secret-api-key
+      vsys:
+        - vsys1
+        - vsys2
+        - vsys3

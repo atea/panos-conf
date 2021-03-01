@@ -43,8 +43,8 @@ class Utilities:
   def get_filepath(self, file):
     return self.get_work_dir() + file
   
-  def create_config_folder(self, hostname):
-    conf_dir = self.get_config_dir() + '/hosts/' + hostname
+  def create_config_folder(self, subdirs):
+    conf_dir = f"{ self.get_config_dir() }/hosts/{ subdirs }"
     if not os.path.exists(conf_dir):
       os.makedirs(conf_dir)
 
@@ -234,7 +234,7 @@ class Utilities:
       return self.get_api_key_keyring()
 
   def write_config_file(self, data, file_params, yaml_flow=False):
-    conf_dir = self.create_config_folder(file_params['hostname'])
+    conf_dir = self.create_config_folder(file_params['conf_dir'])
     conf_file = conf_dir + '/' + file_params['filename'] + '.yml'
     self.yaml_to_file(conf_file, data,
                       file_params['force_overwrite'], yaml_flow)
