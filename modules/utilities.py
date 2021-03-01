@@ -10,6 +10,7 @@ import sys
 import time
 import yaml
 from collections import OrderedDict
+from copy import deepcopy
 from datetime import datetime
 from getpass import getpass
 
@@ -72,17 +73,43 @@ class Utilities:
     return json.dumps(json_content, ensure_ascii=False, sort_keys=True,
                       indent=2, separators=(',', ': '), default=str)
 
-  def format_object(self, obj):
-    dictionary = {}
+  def format_object(self, obj, params):
+    return self.formatted_json_string(self.recurse_object(obj, params))
 
+  def recurse_object(self, obj, params):
+    # params = {
+    #   "class_type": 'panos',
+    #   "ignored_attributes": [ 'parent' ]
+    # }
+    obj_dict = deepcopy({})
     for attribute in dir(obj):
       if (not attribute.startswith('_')
           and not callable(getattr(obj, attribute))
           and not attribute == 'metadata'):
-        dictionary[attribute] = getattr(obj, attribute)
-
-    return self.formatted_json_string(dictionary)
-
+        attr_value = getattr(obj, attribute)
+        if attribute in params['ignored_attributes']:
+          # dont do more lookups on attributes we should ignore
+          obj_dict.update({ attribute: attr_value })
+        else:
+          if isinstance(attr_value, list):
+            obj_list = deepcopy([])
+            for item in attr_value:
+              if params['class_type'] in str(type(item)):
+                obj_list.append({
+                  str(type(item)): self.recurse_object(item, params)
+                })
+              else:
+                obj_list.append(item)
+            obj_dict.update({ attribute: obj_list })
+          else:
+            if params['class_type'] in str(type(attr_value)):
+              obj_dict.update({
+                str(type(attribute)): self.recurse_object(attr_value, params)
+              })
+            else:
+              obj_dict.update({ attribute: attr_value })
+    return obj_dict
+    
   def create_logger(self):
     logger = logging.getLogger('panos-conf')
     logger.setLevel(logging.DEBUG)
