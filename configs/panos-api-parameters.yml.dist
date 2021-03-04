@@ -1,4 +1,152 @@
 ###############################################################################
+################################### DEVICE  ###################################
+###############################################################################
+device:
+  administrator:
+    module: panos.device
+    class: Administrator
+    parent: fw
+    skip: false
+    sort_param: name
+    params:
+      - name                                              # (str) – Admin name
+      - authentication_profile                            # (str) – The authentication profile
+      - web_client_cert_only                              # (bool) – Use only client certificate authentication (Web)
+      - superuser                                         # (bool) – Admin type - superuser
+      - superuser_read_only                               # (bool) – Admin type - superuser, read only
+      - panorama_admin                                    # (bool) – Panonrama - a panorama admin only
+      - device_admin                                      # (bool) – Admin type - device admin
+      - device_admin_read_only                            # (bool) – Admin type - device admin, read only
+      - vsys                                              # (list/str) – Physical firewalls: the vsys this admin should manage
+      - vsys_read_only                                    # (list/str) – Physical firewalls: the vsys this read only admin should manage
+      - ssh_public_key                                    # (str) – Use Public Key Authentication (SSH)
+      - role_profile                                      # (str) – The role based profile
+      - password_hash                                     # (encrypted str) – The encrypted password
+      - password_profile                                  # (str) – The password profile for this user  
+  
+  # TODO: Fix EmailServerProfile + EmailServer. Does not work…
+  email_server:
+    module: panos.device
+    class: EmailServer
+    parent: fw
+    skip: true
+    sort_param: name
+    params:
+      - name                                              # (str) – The name
+      - display_name                                      # (str) – Display name
+      - from                                              # (str) – From email address
+      - to                                                # (str) – To email address
+      - also_to                                           # (str) – Additional destination email address
+      - email_gateway                                     # (str) – IP address or FQDN of email gateway to use
+  email_server_profile:
+    module: panos.device
+    class: EmailServerProfile
+    parent: fw
+    skip: true
+    sort_param: name
+    params:
+      - name                                              # (str) – The name
+      - display_name                                      # (str) – Display name
+      - from                                              # (str) – From email address
+      - to                                                # (str) – To email address
+      - also_to                                           # (str) – Additional destination email address
+      - email_gateway                                     # (str) – IP address or FQDN of email gateway to use
+
+  # TODO: Add support for HttpServerProfile + all childs
+  # TODO: Add support for SnmpServerProfile + SnmpV2cServer + SnmpV3Server
+  # TODO: Add support for SyslogServerProfile + SyslogServer
+
+  system_settings:
+    module: panos.device
+    class: SystemSettings
+    parent: fw
+    skip: false
+    sort_param: hostname
+    params:
+      - hostname                                          # (str) – The hostname of the device
+      - domain                                            # (str) – The domain of the device
+      - ip_address                                        # (str) – Management interface IP address
+      - netmask                                           # (str) – Management interface netmask
+      - default_gateway                                   # (str) – Management interface default gateway
+      - ipv6_address                                      # (str) – Management interface IPv6 address
+      - ipv6_default_gateway                              # (str) – Management interface IPv6 default gateway
+      - dns_primary                                       # (str) – Primary DNS server IP address
+      - dns_secondary                                     # (str) – Secondary DNS server IP address
+      - timezone                                          # (str) – Device timezone
+      # TODO: add support for panorama stuff at some point…
+      # 'panorama' param returns the following:
+      #     "panorama": "<bound method PanObject.panorama of <SystemSettings 0x1066e7700>>",
+      #- panorama                                          # (str) – IP address of primary Panorama
+      #- panorama2                                         # (str) – IP address of secondary Panorama
+      - login_banner                                      # (str) – Login banner text
+      - update_server                                     # (str) – IP or hostname of the update server
+      - verify_update_server                              # (bool) – Verify the update server identity
+      - dhcp_send_hostname                                # (bool) – (DHCP Mngt) Send Hostname
+      - dhcp_send_client_id                               # (bool) – (DHCP Mngt) Send Client ID
+      - accept_dhcp_hostname                              # (bool) – (DHCP Mngt) Accept DHCP hostname
+      - accept_dhcp_domain                                # (bool) – (DHCP Mngt) Accept DHCP domain name
+    children:
+      ntp_primary:
+        module: panos.device
+        class: NTPServerPrimary
+        params:
+          - address                                       # (str) – IP address or hostname of NTP server
+      ntp_secondary:
+        module: panos.device
+        class: NTPServerSecondary
+        params:
+          - address                                       # (str) – IP address or hostname of NTP server
+  telemetry:
+    module: panos.device
+    class: Telemetry
+    parent: fw
+    skip: false
+    sort_param: ~
+    params:
+      - app_reports                                       # (bool) – Application reports
+      - threat_reports                                    # (bool) – Threat preventioin reports
+      - url_reports                                       # (bool) – URL reports
+      - file_type_reports                                 # (bool) – File type identification reports
+      - threat_data                                       # (bool) – Threat prevention data
+      - threat_pcaps                                      # (bool) – Enable sending packet captures with threat prevention information. This requires that “threat_data” also be enabled.
+      - product_usage_stats                               # (bool) – Health and performance reports
+      - passive_dns_monitoring                            # (bool) – Passive DNS monitoring
+  vsys:
+    module: panos.device
+    class: Vsys
+    parent: fw
+    skip: false
+    sort_param: name
+    params:
+      - name                                              # (str) – Vsys identifier (eg. ‘vsys1’, ‘vsys5’, etc)
+      - display_name                                      # (str) – Friendly name of the vsys
+      - interface                                         # (list) – A list of strings with names of interfaces or a list of panos.network.Interface objects
+      - vlans                                             # (list) – A list of strings of VLANs
+      - virtual_wires                                     # (list) – A list of strings of virtual wires
+      - virtual_routers                                   # (list) – A list of strings of virtual routers
+      - visible_vsys                                      # (list) – A list of strings of the vsys visible
+      - dns_proxy                                         # (str) – DNS Proxy server
+      - decrypt_forwarding                                # (bool) – Allow forwarding of decrypted content
+  vsys_resources:
+    module: panos.device
+    class: VsysResources
+    parent: fw
+    skip: true
+    sort_param: ~
+    params:
+      - max_security_rules                                # (int) – Maximum security rules
+      - max_nat_rules                                     # (int) – Maximum nat rules
+      - max_ssl_decryption_rules                          # (int) – Maximum ssl decryption rules
+      - max_qos_rules                                     # (int) – Maximum QOS rules
+      - max_application_override_rules                    # (int) – Maximum application override rules
+      - max_pbf_rules                                     # (int) – Maximum policy based forwarding rules
+      - max_cp_rules                                      # (int) – Maximum captive portal rules
+      - max_dos_rules                                     # (int) – Maximum DOS rules
+      - max_site_to_site_vpn_tunnels                      # (int) – Maximum site-to-site VPN tunnels
+      - max_concurrent_ssl_vpn_tunnels                    # (int) – Maximum ssl VPN tunnels
+      - max_sessions                                      # (int) – Maximum sessions
+
+###############################################################################
 ################################### OBJECTS ###################################
 ###############################################################################
 objects:
@@ -9,11 +157,11 @@ objects:
     skip: false
     sort_param: name
     params: 
-      - name                      # (str) - Name of the address group
-      - static_value              # (list) - Values for a static address group
-      - dynamic_value             # (str) - Registered-ip tags for a dynamic address group
-      - description               # (str) - Description of this object
-      - tag                       # (list) - Administrative tags (not to be confused with registered-ip tags)
+      - name                                              # (str) - Name of the address group
+      - static_value                                      # (list) - Values for a static address group
+      - dynamic_value                                     # (str) - Registered-ip tags for a dynamic address group
+      - description                                       # (str) - Description of this object
+      - tag                                               # (list) - Administrative tags (not to be confused with registered-ip tags)
   address_object:
     module: panos.objects
     class: AddressObject
@@ -21,11 +169,11 @@ objects:
     skip: false
     sort_param: name
     params:
-      - name                      # (str) - Name of the object
-      - value                     # (str) - IP address or other value of the object
-      - type                      # (str) - Type of address: * ip-netmask (default) * ip-range * ip-wildcard (added in PAN-OS 9.0) * fqdn
-      - description               # (str) - Description of this object
-      - tag                       # (list) - Administrative tags
+      - name                                              # (str) - Name of the object
+      - value                                             # (str) - IP address or other value of the object
+      - type                                              # (str) - Type of address: * ip-netmask (default) * ip-range * ip-wildcard (added in PAN-OS 9.0) * fqdn
+      - description                                       # (str) - Description of this object
+      - tag                                               # (list) - Administrative tags
   application_container:
     module: panos.objects
     class: ApplicationContainer
@@ -33,7 +181,7 @@ objects:
     skip: true
     sort_param: null
     params:
-      - applications              # (list) - List of memeber applications
+      - applications                                      # (list) - List of memeber applications
   application_filter:
     module: panos.objects
     class: ApplicationFilter
@@ -41,21 +189,21 @@ objects:
     skip: true
     sort_param: name
     params:
-      - name                      # (str) - Name of the object
-      - category                  # (list) – Application category
-      - subcategory               # (list) – Application subcategory
-      - technology                # (list) – Application technology
-      - risk                      # (list) – Application risk
-      - evasive                   # (bool) –
-      - excessive_bandwidth_use   # (bool) –
-      - prone_to_misuse           # (bool) –
-      - is_saas                   # (bool) –
-      - transfers_files           # (bool) –
-      - tunnels_other_apps        # (bool) –
-      - used_by_malware           # (bool) –
-      - has_known_vulnerabilities # (bool) –
-      - pervasive                 # (bool) –
-      - tag                       # (list) – Administrative tags
+      - name                                              # (str) - Name of the object
+      - category                                          # (list) – Application category
+      - subcategory                                       # (list) – Application subcategory
+      - technology                                        # (list) – Application technology
+      - risk                                              # (list) – Application risk
+      - evasive                                           # (bool) –
+      - excessive_bandwidth_use                           # (bool) –
+      - prone_to_misuse                                   # (bool) –
+      - is_saas                                           # (bool) –
+      - transfers_files                                   # (bool) –
+      - tunnels_other_apps                                # (bool) –
+      - used_by_malware                                   # (bool) –
+      - has_known_vulnerabilities                         # (bool) –
+      - pervasive                                         # (bool) –
+      - tag                                               # (list) – Administrative tags
   application_group:
     module: panos.objects
     class: ApplicationGroup
@@ -63,9 +211,9 @@ objects:
     skip: false
     sort_param: name
     params:
-      - name                      # (str) – Name of the object
-      - value                     # (list) – List of application values
-      - tag                       # (list) – Administrative tags
+      - name                                              # (str) – Name of the object
+      - value                                             # (list) – List of application values
+      - tag                                               # (list) – Administrative tags
   application_object:
     module: panos.objects
     class: ApplicationObject
@@ -73,33 +221,33 @@ objects:
     skip: true
     sort_param: name
     params:
-      - name                      # (str) – Name of the object
-      - category                  # (str) – Application category
-      - subcategory               # (str) – Application subcategory
-      - technology                # (str) – Application technology
-      - risk                      # (int) – Risk (1-5) of the application
-      - default_type              # (str) – Default identification type of the application
-      - default_value             # (list) – Values for the default type
-      - parent_app                # (str) – Parent Application for which this app falls under
-      - timeout                   # (int) – Default timeout
-      - tcp_timeout               # (int) – TCP timeout
-      - udp_timeout               # (int) – UDP timeout
-      - tcp_half_closed_timeout   # (int) – TCP half closed timeout
-      - tcp_time_wait_timeout     # (int) – TCP wait time timeout
-      - evasive_behavior          # (bool) – Applicaiton is actively evasive
-      - consume_big_bandwidth     # (bool) – Application uses large bandwidth
-      - used_by_malware           # (bool) – Application is used by malware
-      - able_to_transfer_file     # (bool) – Application can do file transfers
-      - has_known_vulnerability   # (bool) – Application has known vulnerabilities
-      - tunnel_other_application  # (bool) –
-      - tunnel_applications       # (list) – List of tunneled applications
-      - prone_to_misuse           # (bool) –
-      - pervasive_use             # (bool) –
-      - file_type_ident           # (bool) –
-      - virus_ident               # (bool) –
-      - data_ident                # (bool) –
-      - description               # (str) – Description of this object
-      - tag                       # (list) – Administrative tags
+      - name                                              # (str) – Name of the object
+      - category                                          # (str) – Application category
+      - subcategory                                       # (str) – Application subcategory
+      - technology                                        # (str) – Application technology
+      - risk                                              # (int) – Risk (1-5) of the application
+      - default_type                                      # (str) – Default identification type of the application
+      - default_value                                     # (list) – Values for the default type
+      - parent_app                                        # (str) – Parent Application for which this app falls under
+      - timeout                                           # (int) – Default timeout
+      - tcp_timeout                                       # (int) – TCP timeout
+      - udp_timeout                                       # (int) – UDP timeout
+      - tcp_half_closed_timeout                           # (int) – TCP half closed timeout
+      - tcp_time_wait_timeout                             # (int) – TCP wait time timeout
+      - evasive_behavior                                  # (bool) – Applicaiton is actively evasive
+      - consume_big_bandwidth                             # (bool) – Application uses large bandwidth
+      - used_by_malware                                   # (bool) – Application is used by malware
+      - able_to_transfer_file                             # (bool) – Application can do file transfers
+      - has_known_vulnerability                           # (bool) – Application has known vulnerabilities
+      - tunnel_other_application                          # (bool) –
+      - tunnel_applications                               # (list) – List of tunneled applications
+      - prone_to_misuse                                   # (bool) –
+      - pervasive_use                                     # (bool) –
+      - file_type_ident                                   # (bool) –
+      - virus_ident                                       # (bool) –
+      - data_ident                                        # (bool) –
+      - description                                       # (str) – Description of this object
+      - tag                                               # (list) – Administrative tags
   custom_url_category:
     module: panos.objects
     class: CustomUrlCategory
@@ -107,9 +255,9 @@ objects:
     skip: true
     sort_param: name
     params:
-      - name                      # (str) – The name
-      - url_value                 # (list) – Values to include in custom URL category object
-      - description               # (str) – Description of this object
+      - name                                              # (str) – The name
+      - url_value                                         # (list) – Values to include in custom URL category object
+      - description                                       # (str) – Description of this object
   dynamic_user_group:
     module: panos.objects
     class: DynamicUserGroup
@@ -117,10 +265,10 @@ objects:
     skip: true
     sort_param: name
     params:
-      - name                      # (str) – Name of the dynamic user group
-      - description               # (str) – Description of this object
-      - filter                    # (str) – Tag-based filter.
-      - tag                       # (list) – Administrative tags
+      - name                                              # (str) – Name of the dynamic user group
+      - description                                       # (str) – Description of this object
+      - filter                                            # (str) – Tag-based filter.
+      - tag                                               # (list) – Administrative tags
   log_forwarding_profile:
     module: panos.objects
     class: LogForwardingProfile
@@ -128,9 +276,9 @@ objects:
     skip: true
     sort_param: name
     params:
-      - name                      # (str) – The name
-      - description               # (str) – The description
-      - enhanced_logging          # (bool) – (PAN-OS 8.1+) Enabling enhanced application logging
+      - name                                              # (str) – The name
+      - description                                       # (str) – The description
+      - enhanced_logging                                  # (bool) – (PAN-OS 8.1+) Enabling enhanced application logging
   log_forwarding_profile_match_list:
     module: panos.objects
     class: LogForwardingProfileMatchList
@@ -138,15 +286,15 @@ objects:
     skip: true
     sort_param: name
     params:
-      - name                      # (str) – The name
-      - description               # (str) – Description
-      - log_type                  # (str) – Log type. Valid values are traffic, threat, wildfire, url, data, gtp, tunnel, auth, or sctp (PAN-OS 8.1+).
-      - filter                    # (str) – The filter.
-      - send_to_panorama          # (bool) – Send to panorama or not
-      - snmp_profiles             # (str/list) – List of SnmpServerProfiles.
-      - email_profiles            # (str/list) – List of EmailServerProfiles.
-      - syslog_profiles           # (str/list) – List of SyslogServerProfiles.
-      - http_profiles             # (str/list) – List of HttpServerProfiles.
+      - name                                              # (str) – The name
+      - description                                       # (str) – Description
+      - log_type                                          # (str) – Log type. Valid values are traffic, threat, wildfire, url, data, gtp, tunnel, auth, or sctp (PAN-OS 8.1+).
+      - filter                                            # (str) – The filter.
+      - send_to_panorama                                  # (bool) – Send to panorama or not
+      - snmp_profiles                                     # (str/list) – List of SnmpServerProfiles.
+      - email_profiles                                    # (str/list) – List of EmailServerProfiles.
+      - syslog_profiles                                   # (str/list) – List of SyslogServerProfiles.
+      - http_profiles                                     # (str/list) – List of HttpServerProfiles.
   log_forwarding_profile_match_list_action:
     module: panos.objects
     class: LogForwardingProfileMatchListAction
@@ -154,14 +302,14 @@ objects:
     skip: true
     sort_param: name
     params:
-      - name                      # (str) – The name
-      - action_type               # (str) – Action type. Valid values are tagging (default) or (PAN-OS 8.1+) integration.
-      - action                    # (str) – The action. Valid values are add-tag, remove-tag, or (PAN-OS 8.1+) Azure-Security-Center-Integration.
-      - target                    # (str) – The target. Valid values are source-address or destination-address.
-      - registration              # (str) – Registration. Valid values are localhost, panorama, or remote.
-      - http_profile              # (str) – The HTTP profile for registration of “remote”.
-      - tags                      # (str/list) – List of administrative tags.
-      - timeout                   # (int) – (PAN-OS 9.0+) Timeout in minutes
+      - name                                              # (str) – The name
+      - action_type                                       # (str) – Action type. Valid values are tagging (default) or (PAN-OS 8.1+) integration.
+      - action                                            # (str) – The action. Valid values are add-tag, remove-tag, or (PAN-OS 8.1+) Azure-Security-Center-Integration.
+      - target                                            # (str) – The target. Valid values are source-address or destination-address.
+      - registration                                      # (str) – Registration. Valid values are localhost, panorama, or remote.
+      - http_profile                                      # (str) – The HTTP profile for registration of “remote”.
+      - tags                                              # (str/list) – List of administrative tags.
+      - timeout                                           # (int) – (PAN-OS 9.0+) Timeout in minutes
   region:
     module: panos.objects
     class: Region
@@ -169,10 +317,10 @@ objects:
     skip: true
     sort_param: name
     params:
-      - name                      # (str) – Name of the region
-      - address                   # (list) – List of IP networks
-      - latitude                  # (float) – Latitude of the region
-      - longitude                 # (float) – Longitude of the region
+      - name                                              # (str) – Name of the region
+      - address                                           # (list) – List of IP networks
+      - latitude                                          # (float) – Latitude of the region
+      - longitude                                         # (float) – Longitude of the region
   schedule_object:
     module: panos.objects
     class: ScheduleObject
@@ -180,19 +328,19 @@ objects:
     skip: true
     sort_param: name
     params:
-      - name                      # (str) – Name of the object
-      - disable_override          # (bool) – “True” to set disable-override
-      - type                      # (str) – Type of Schedule: “recurring” or “non-recurring”
-      - non_recurring_date_time   # (list/str) – “Date and Time Range” string for a non-recurring schedule
-      - recurrence                # (str) – “daily” or “weekly” recurrence
-      - daily_time                # (list/str) – “Time Range” for a daily recurring schedule
-      - weekly_sunday_time        # (list/str) – “Time Range” for a weekly recurring schedule (Sunday)
-      - weekly_monday_time        # (list/str) – “Time Range” for a weekly recurring schedule (Monday)
-      - weekly_tuesday_time       # (list/str) – “Time Range” for a weekly recurring schedule (Tuesday)
-      - weekly_wednesday_time     # (list/str) – “Time Range” for a weekly recurring schedule (Wednesday)
-      - weekly_thursday_time      # (list/str) – “Time Range” for a weekly recurring schedule (Thursday)
-      - weekly_friday_time        # (list/str) – “Time Range” for a weekly recurring schedule (Friday)
-      - weekly_saturday_time      # (list/str) – “Time Range” for a weekly recurring schedule (Saturday)
+      - name                                              # (str) – Name of the object
+      - disable_override                                  # (bool) – “True” to set disable-override
+      - type                                              # (str) – Type of Schedule: “recurring” or “non-recurring”
+      - non_recurring_date_time                           # (list/str) – “Date and Time Range” string for a non-recurring schedule
+      - recurrence                                        # (str) – “daily” or “weekly” recurrence
+      - daily_time                                        # (list/str) – “Time Range” for a daily recurring schedule
+      - weekly_sunday_time                                # (list/str) – “Time Range” for a weekly recurring schedule (Sunday)
+      - weekly_monday_time                                # (list/str) – “Time Range” for a weekly recurring schedule (Monday)
+      - weekly_tuesday_time                               # (list/str) – “Time Range” for a weekly recurring schedule (Tuesday)
+      - weekly_wednesday_time                             # (list/str) – “Time Range” for a weekly recurring schedule (Wednesday)
+      - weekly_thursday_time                              # (list/str) – “Time Range” for a weekly recurring schedule (Thursday)
+      - weekly_friday_time                                # (list/str) – “Time Range” for a weekly recurring schedule (Friday)
+      - weekly_saturday_time                              # (list/str) – “Time Range” for a weekly recurring schedule (Saturday)
   security_profile_group:
     module: panos.objects
     class: SecurityProfileGroup
@@ -200,14 +348,14 @@ objects:
     skip: false
     sort_param: name
     params:
-      - name                      # (str) – The group name
-      - virus                     # (str) – Antivirus profile
-      - spyware                   # (str) – Anti-spyware profile
-      - vulnerability             # (str) – Vulnerability protection profile
-      - url_filtering             # (str) – URL filtering profile
-      - file_blocking             # (str) – File blocking profile
-      - data_filtering            # (str) – Data filtering profile
-      - wildfire_analysis         # (str) – WildFire analysis profile
+      - name                                              # (str) – The group name
+      - virus                                             # (str) – Antivirus profile
+      - spyware                                           # (str) – Anti-spyware profile
+      - vulnerability                                     # (str) – Vulnerability protection profile
+      - url_filtering                                     # (str) – URL filtering profile
+      - file_blocking                                     # (str) – File blocking profile
+      - data_filtering                                    # (str) – Data filtering profile
+      - wildfire_analysis                                 # (str) – WildFire analysis profile
   service_group:
     module: panos.objects
     class: ServiceGroup
@@ -215,9 +363,9 @@ objects:
     skip: false
     sort_param: name
     params:
-      - name                      # (str) – Name of the object
-      - value                     # (list) – List of service values
-      - tag                       # (list) – Administrative tags
+      - name                                              # (str) – Name of the object
+      - value                                             # (list) – List of service values
+      - tag                                               # (list) – Administrative tags
   service_object:
     module: panos.objects
     class: ServiceObject
@@ -225,12 +373,12 @@ objects:
     skip: false
     sort_param: name
     params:
-      - name                      # (str) – Name of the object
-      - protocol                  # (str) – Protocol of the service, either tcp or udp
-      - source_port               # (str) – Source port of the protocol, if any
-      - destination_port          # (str) – Destination port of the service
-      - description               # (str) – Description of this object
-      - tag                       # (list) – Administrative tags
+      - name                                              # (str) – Name of the object
+      - protocol                                          # (str) – Protocol of the service, either tcp or udp
+      - source_port                                       # (str) – Source port of the protocol, if any
+      - destination_port                                  # (str) – Destination port of the service
+      - description                                       # (str) – Description of this object
+      - tag                                               # (list) – Administrative tags
   tag:
     module: panos.objects
     class: Tag
@@ -238,9 +386,9 @@ objects:
     skip: false
     sort_param: name
     params:
-      - name                      # (str) – Name of the tag
-      - color                     # (str) – Color ID (eg. ‘color1’, ‘color4’, etc). You can use color_code() to generate the ID.
-      - comments                  # (str) – Comments
+      - name                                              # (str) – Name of the tag
+      - color                                             # (str) – Color ID (eg. ‘color1’, ‘color4’, etc). You can use color_code() to generate the ID.
+      - comments                                          # (str) – Comments
     # accepted color strings for color_code() method
     # "red": 1, "green": 2, "blue": 3, "yellow": 4, "copper": 5, "orange": 6,
     # "purple": 7, "gray": 8, "light green": 9, "cyan": 10, "light gray": 11,

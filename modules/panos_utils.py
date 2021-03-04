@@ -12,7 +12,7 @@ class PanosUtils:
       for key, value in kwargs.items():
         setattr(self, key, value)
     
-  def connect_to_fw(self, hostname, vsys='vsys1', args=None):
+  def connect_to_fw(self, hostname, vsys=None, args=None):
     try:
       fw = panos.firewall.Firewall(
         hostname = hostname,
@@ -30,16 +30,18 @@ class PanosUtils:
 
     for hostname in fw_configs:
       for vsys in fw_configs[hostname]:
-        config_types = fw_configs[hostname][vsys]['config']
-        for config_type in config_types:
-          for config_child in config_types[config_type]:
+        modules = fw_configs[hostname][vsys]['config_modules']
+        for module in modules:
+          for object_type in modules[module]:
             file_params = {
               "conf_dir": f"{ hostname }/{ vsys }",
-              "filename": f"/{ config_type }_{ config_child }",
+              "filename": f"/{ module }_{ object_type }",
               "force_overwrite": force_overwrite
             }
-            data = config_types[config_type][config_child]
-            self.utils.write_config_file(data, file_params)
+            data = modules[module][object_type]
+            if len(data) > 0:
+              # don't write blank configs
+              self.utils.write_config_file(data, file_params)
 
   def get_configs_from_all_firewalls(self, return_object=False):
     fw_configs = {}
@@ -51,61 +53,98 @@ class PanosUtils:
           "add": False,
           "return_object": return_object
         }
-        fw = self.connect_to_fw(hostname, vsys, conn['args'])
+        # TODO: temporary workaround until we figure out proper vsys support
+        # TODO: we should also use the device_vsys config somehow?
+        # TODO: maybe bootstrap it somehow? (i.e. if file not defined, then assume "None")
+        if (len(args['vsys']) < 2) and (vsys == 'vsys1'):
+          # on device that only has one vsys
+          conn_vsys = None
+        else:
+          conn_vsys = vsys
+        
+        fw = self.connect_to_fw(hostname, conn_vsys, conn['args'])
         if fw is None:
           continue
         conn['fw'] = fw
         conn['rulebase'] = panos.policies.Rulebase()
         conn['fw'].add(conn['rulebase'])
 
-        fw_config = self.get_config_types_from_firewall(conn)
+        fw_config = self.get_modules_from_firewall(conn)
         fw_configs[hostname] = {}
         fw_configs[hostname][vsys] = {}
         fw_configs[hostname][vsys]['conn'] = conn
-        fw_configs[hostname][vsys]['config'] = fw_config
+        fw_configs[hostname][vsys]['config_modules'] = fw_config
     return fw_configs
 
-  def get_config_types_from_firewall(self, conn):
-    config_types = self.utils.api_params
-    fw_config = {}
-    for config_type in config_types:
-      fw_config[config_type] = self.get_config_children_from_firewall(
-          conn, config_types[config_type])
-    return fw_config
+  def get_modules_from_firewall(self, conn):
+    modules = self.utils.api_params
+    modules_config = {}
+    for module in modules:
+      modules_config[module] = self.get_objects_from_firewall(conn, modules[module])
+    return modules_config
   
-  def get_config_children_from_firewall(self, conn, config_type):
-    fw_config = {}
-    for config_child in config_type:
-      if config_type[config_child]['skip']:
+  def get_objects_from_firewall(self, conn, module):
+    objects_config = {}
+    for object_type in module:
+      if module[object_type]['skip']:
         continue
 
-      config_info = config_type[config_child]
-      config_class = self.utils.class_for_name(config_info['module'],
-                                               config_info['class'])
-      data = self.get_config_class_from_firewall(conn, config_info, 
-                                                 config_class)
-      fw_config[config_child] = data
-    return fw_config
+      object_info = module[object_type]
+      object_class = self.utils.class_for_name(object_info['module'],
+                                               object_info['class'])
+      object_data = self.get_object_from_firewall(conn, object_info, object_class)
+      objects_config[object_type] = object_data
+    return objects_config
       
-  def get_config_class_from_firewall(self, conn, config_info, config_class):
-    class_config = config_class.refreshall(conn[config_info['parent']],
-                                           conn['add'])
+  def get_object_from_firewall(self, conn, object_info, object_class):
+    object_data = object_class.refreshall(conn[object_info['parent']],
+                                          conn['add'])
     
     if conn['return_object']:
-      return class_config
+      return object_data
     else:
-      data = []
-      for obj in class_config:
-        obj_info = {}
-        for param in config_info['params']:
-          obj_param = getattr(obj, param)
-          if (obj_param is not None or
-              not self.utils.config['settings']['skip_null_param']):
-            obj_info[param] = obj_param
-        data.append(dict(obj_info))
+      # we convert to dictionary
+      return self.parse_object_from_firewall(object_data, object_info)
       
-      if config_info['sort_param'] is None:
-        # we don't sort these, as order matters
-        return data
-      else:
-        return sorted(data, key=lambda k: k[config_info['sort_param']])
+  def parse_object_from_firewall(self, object_data, object_info):
+    object_list = []
+    for obj in object_data:
+      obj_info = {}
+      for param in object_info['params']:
+        param_value = getattr(obj, param)
+        if (param_value is not None or
+            not self.utils.config['settings']['skip_null_param']):
+          obj_info[param] = param_value
+      
+      # traverse children
+      # TODO: make recursive (only goes 1 level currently)
+      children = getattr(obj, 'children', False)
+      if children and object_info.get('children', False):
+        if len(children) > 0:
+          # we have children
+          child_dict = {}
+          for child_obj in children:
+            # check if configured same class
+            for child_conf in object_info['children']:
+              child_conf_info = object_info['children'][child_conf]
+              child_conf_class = self.utils.class_for_name(
+                  child_conf_info['module'],
+                  child_conf_info['class']
+              )
+
+              if isinstance(child_obj, child_conf_class):
+                for param in child_conf_info['params']:
+                  param_value = getattr(child_obj, param)
+                  if (param_value is not None or
+                      not self.utils.config['settings']['skip_null_param']):
+                    child_dict[child_conf] = {
+                      param: param_value
+                    }
+            obj_info['children'] = child_dict
+      object_list.append(dict(obj_info))
+    
+    if object_info['sort_param'] is None:
+      # we don't sort these, as order matters
+      return object_list
+    else:
+      return sorted(object_list, key=lambda k: k[object_info['sort_param']])
