@@ -136,20 +136,27 @@ class PanosUtils:
     return False
 
   def get_object_children(self, obj, object_info):
-    child_dict = {}
+    children_dict = {}
     children = getattr(obj, 'children', [])
-    for child_obj in children:
-      # check if we have matching class configured
-      
+    for child_obj in children:     
       for child_conf in object_info['children']:
-        child_conf_info = self.utils.api_params['children'][child_conf['name']]
+        child_name = child_conf['name']
+        child_conf_info = self.utils.api_params['children'][child_name]
         child_conf_class = self.utils.class_for_name(
           child_conf_info['module'],
           child_conf_info['class']
         )
 
         if isinstance(child_obj, child_conf_class):
-          child_dict[child_conf['name']] = self.get_object_attributes(
+          child_dict = self.get_object_attributes(
               child_obj, child_conf_info['params'])
-          #print(f"child_dict: { child_dict }")
-    
+
+          if self.object_has_children(child_obj, child_conf):
+            child_dict['children'] = self.get_object_children(
+                child_obj, child_conf)
+          
+          if child_conf['name'] not in children_dict:
+            children_dict[child_conf['name']] = []
+          children_dict[child_conf['name']].append(child_dict)        
+            
+    return children_dict
