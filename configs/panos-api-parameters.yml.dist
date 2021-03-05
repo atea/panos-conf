@@ -1585,11 +1585,13 @@ children:
   ntp_primary:
     module: panos.device
     class: NTPServerPrimary
+    sort_param: ~
     params:
       - address                                             # (str) – IP address or hostname of NTP server
   ntp_secondary:
     module: panos.device
     class: NTPServerSecondary
+    sort_param: ~
     params:
       - address                                             # (str) – IP address or hostname of NTP server
   ospf:
@@ -1750,7 +1752,7 @@ children:
   static_mac:
     module: panos.network
     class: ManagementProfile
-    sort_param: name
+    sort_param: mac
     params:
       - mac                                                 # (str) - Static MAC
       - interface                                           # (str) - Interface
@@ -1798,6 +1800,7 @@ children:
   telemetry:
     module: panos.device
     class: Telemetry
+    sort_param: ~
     params:
       - app_reports                                         # (bool) – Application reports
       - threat_reports                                      # (bool) – Threat preventioin reports

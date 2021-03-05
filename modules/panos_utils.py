@@ -152,11 +152,13 @@ class PanosUtils:
               child_obj, child_conf_info['params'])
 
           if self.object_has_children(child_obj, child_conf):
-            child_dict['children'] = self.get_object_children(
-                child_obj, child_conf)
+            child_dict['children'] = self.get_object_children(child_obj,
+                                                              child_conf)
           
           if child_conf['name'] not in children_dict:
             children_dict[child_conf['name']] = []
-          children_dict[child_conf['name']].append(child_dict)        
-            
+          children_dict[child_conf['name']].append(child_dict)
+          children_dict[child_conf['name']] = self.utils.return_sorted_list(
+              children_dict[child_conf['name']], child_conf_info['sort_param'])
+
     return children_dict
