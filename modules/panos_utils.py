@@ -77,7 +77,7 @@ class PanosUtils:
     return fw_configs
 
   def get_modules_from_firewall(self, conn):
-    modules = self.utils.api_params
+    modules = self.utils.api_params['modules']
     modules_config = {}
     for module in modules:
       modules_config[module] = self.get_objects_from_firewall(conn, 
@@ -111,44 +111,45 @@ class PanosUtils:
   def parse_object_from_firewall(self, object_data, object_info):
     object_list = []
     for obj in object_data:
-      obj_info = {}
-      for param in object_info['params']:
-        param_value = getattr(obj, param, None)
-        if (param_value is not None or
-            not self.utils.config['settings']['skip_null_param']):
-          obj_info[param] = param_value
-      
-      # traverse children
-      # TODO: make recursive (only goes 1 level currently)
-      children = getattr(obj, 'children', False)
-      if children and object_info.get('children', False):
-        if len(children) > 0:
-          # we have children
-          child_dict = {}
-          for child_obj in children:
-            # check if configured same class
-            for child_conf in object_info['children']:
-              child_conf_info = object_info['children'][child_conf]
-              child_conf_class = self.utils.class_for_name(
-                  child_conf_info['module'],
-                  child_conf_info['class']
-              )
-
-              if isinstance(child_obj, child_conf_class):
-                for param in child_conf_info['params']:
-                  param_value = getattr(child_obj, param)
-                  if (param_value is not None or
-                      not self.utils.config['settings']['skip_null_param']):
-                    child_dict[child_conf] = {
-                      param: param_value
-                    }
-            # TODO: lists of dicts??
-            # TODO: sort children by whatever configured where relevant
-            obj_info['children'] = child_dict
+      obj_info = self.get_object_attributes(obj, object_info['params'])
+      if self.object_has_children(obj, object_info):
+        obj_info['children'] = self.get_object_children(obj, object_info)
       object_list.append(dict(obj_info))
+
+    return self.utils.return_sorted_list(object_list, 
+                                         object_info['sort_param'])
+
+  def get_object_attributes(self, obj, params):
+    obj_info = {}
+    for param in params:
+      param_value = getattr(obj, param, None)
+      if (param_value is not None or
+          not self.utils.config['settings']['skip_null_param']):
+        obj_info[param] = param_value
+    return obj_info
+
+  def object_has_children(self, obj, object_info):
+    children = getattr(obj, 'children', False)
+    if children and object_info.get('children', False):
+      if len(children) > 0:
+        return True
+    return False
+
+  def get_object_children(self, obj, object_info):
+    child_dict = {}
+    children = getattr(obj, 'children', [])
+    for child_obj in children:
+      # check if we have matching class configured
+      
+      for child_conf in object_info['children']:
+        child_conf_info = self.utils.api_params['children'][child_conf['name']]
+        child_conf_class = self.utils.class_for_name(
+          child_conf_info['module'],
+          child_conf_info['class']
+        )
+
+        if isinstance(child_obj, child_conf_class):
+          child_dict[child_conf['name']] = self.get_object_attributes(
+              child_obj, child_conf_info['params'])
+          #print(f"child_dict: { child_dict }")
     
-    if object_info['sort_param'] is None:
-      # we don't sort these, as order matters
-      return object_list
-    else:
-      return sorted(object_list, key=lambda k: k[object_info['sort_param']])

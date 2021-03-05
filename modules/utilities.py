@@ -265,3 +265,9 @@ class Utilities:
     conf_file = conf_dir + '/' + file_params['filename'] + '.yml'
     self.yaml_to_file(conf_file, data,
                       file_params['force_overwrite'], yaml_flow)
+
+  def return_sorted_list(self, unsorted_list, sort_param):
+    if sort_param is None:
+      return unsorted_list
+    else:
+      return sorted(unsorted_list, key=lambda k: k[sort_param])
