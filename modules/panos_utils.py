@@ -62,12 +62,12 @@ class PanosUtils:
         else:
           conn_vsys = vsys
         
-        fw = self.connect_to_fw(hostname, conn_vsys, conn['args'])
-        if fw is None:
+        vsys_conn = self.connect_to_fw(hostname, conn_vsys, conn['args'])
+        if vsys_conn is None:
           continue
-        conn['fw'] = fw
+        conn['vsys'] = vsys_conn
         conn['rulebase'] = panos.policies.Rulebase()
-        conn['fw'].add(conn['rulebase'])
+        conn['vsys'].add(conn['rulebase'])
 
         fw_config = self.get_modules_from_firewall(conn)
         fw_configs[hostname] = {}
@@ -80,7 +80,8 @@ class PanosUtils:
     modules = self.utils.api_params
     modules_config = {}
     for module in modules:
-      modules_config[module] = self.get_objects_from_firewall(conn, modules[module])
+      modules_config[module] = self.get_objects_from_firewall(conn, 
+                                                              modules[module])
     return modules_config
   
   def get_objects_from_firewall(self, conn, module):
@@ -92,7 +93,8 @@ class PanosUtils:
       object_info = module[object_type]
       object_class = self.utils.class_for_name(object_info['module'],
                                                object_info['class'])
-      object_data = self.get_object_from_firewall(conn, object_info, object_class)
+      object_data = self.get_object_from_firewall(conn, object_info, 
+                                                  object_class)
       objects_config[object_type] = object_data
     return objects_config
       
@@ -111,7 +113,7 @@ class PanosUtils:
     for obj in object_data:
       obj_info = {}
       for param in object_info['params']:
-        param_value = getattr(obj, param)
+        param_value = getattr(obj, param, None)
         if (param_value is not None or
             not self.utils.config['settings']['skip_null_param']):
           obj_info[param] = param_value
@@ -140,6 +142,8 @@ class PanosUtils:
                     child_dict[child_conf] = {
                       param: param_value
                     }
+            # TODO: lists of dicts??
+            # TODO: sort children by whatever configured where relevant
             obj_info['children'] = child_dict
       object_list.append(dict(obj_info))
     

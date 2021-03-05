@@ -1,519 +1,1809 @@
+modules:
+  #############################################################################
+  ################################### DEVICE  #################################
+  #############################################################################
+  device:
+    administrator:
+      module: panos.device
+      class: Administrator
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – Admin name
+        - authentication_profile                            # (str) – The authentication profile
+        - web_client_cert_only                              # (bool) – Use only client certificate authentication (Web)
+        - superuser                                         # (bool) – Admin type - superuser
+        - superuser_read_only                               # (bool) – Admin type - superuser, read only
+        - panorama_admin                                    # (bool) – Panonrama - a panorama admin only
+        - device_admin                                      # (bool) – Admin type - device admin
+        - device_admin_read_only                            # (bool) – Admin type - device admin, read only
+        - vsys                                              # (list/str) – Physical firewalls: the vsys this admin should manage
+        - vsys_read_only                                    # (list/str) – Physical firewalls: the vsys this read only admin should manage
+        - ssh_public_key                                    # (str) – Use Public Key Authentication (SSH)
+        - role_profile                                      # (str) – The role based profile
+        - password_hash                                     # (encrypted str) – The encrypted password
+        - password_profile                                  # (str) – The password profile for this user 
+    email_server_profile:
+      module: panos.device
+      class: EmailServerProfile
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – The name
+        - config                                            # (str) – Custom config log format
+        - system                                            # (str) – Custom system log format
+        - threat                                            # (str) – Custom threat log format
+        - traffic                                           # (str) – Custom traffic log format
+        - hip_match                                         # (str) – Custom HIP match log format
+        - url                                               # (str) – (PAN-OS 8.0+) Custom URL log format
+        - data                                              # (str) – (PAN-OS 8.0+) Custom data log format
+        - wildfire                                          # (str) – (PAN-OS 8.0+) Custom WildFire log format
+        - tunnel                                            # (str) – (PAN-OS 8.0+) Custom tunnel log format
+        - user_id                                           # (str) – (PAN-OS 8.0+) Custom user-ID log format
+        - gtp                                               # (str) – (PAN-OS 8.0+) Custom GTP log format
+        - auth                                              # (str) – (PAN-OS 8.0+) Custom authentication log format
+        - sctp                                              # (str) – (PAN-OS 8.1+) Custom SCTP log format
+        - iptag                                             # (str) – (PAN-OS 9.0+) Custom Iptag log format
+        - escaped_characters                                # (str) – Characters to be escaped
+        - escape_character                                  # (str) – Escape character
+      children:
+        - name: email_server
+    http_server_profile:
+      module: panos.device
+      class: HttpServerProfile
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – The name
+        - tag_registration                                  # (bool) – The server should have User-ID agent running in order for tag registration to work
+        - config_name                                       # (str) – Name for custom config format
+        - config_uri_format                                 # (str) – URI format for custom config format
+        - config_payload                                    # (str) – Payload for custom config format
+        - system_name                                       # (str) – Name for custom system format
+        - system_uri_format                                 # (str) – URI format for custom system format
+        - system_payload                                    # (str) – Payload for custom system format
+        - threat_name                                       # (str) – Name for custom threat format
+        - threat_uri_format                                 # (str) – URI format for custom threat format
+        - threat_payload                                    # (str) – Payload for custom threat format
+        - traffic_name                                      # (str) – Name for custom traffic format
+        - traffic_uri_format                                # (str) – URI format for custom traffic format
+        - traffic_payload                                   # (str) – Payload for custom traffic format
+        - hip_match_name                                    # (str) – Name for custom HIP match format
+        - hip_match_uri_format                              # (str) – URI format for custom HIP match format
+        - hip_match_payload                                 # (str) – Payload for custom HIP match format
+        - url_name                                          # (str) – Name for custom url format
+        - url_uri_format                                    # (str) – URI format for custom url format
+        - url_payload                                       # (str) – Payload for custom url format
+        - data_name                                         # (str) – Name for custom data format
+        - data_uri_format                                   # (str) – URI format for custom data format
+        - data_payload                                      # (str) – Payload for custom data format
+        - wildfire_name                                     # (str) – Name for custom wildfire format
+        - wildfire_uri_format                               # (str) – URI format for custom wildfire format
+        - wildfire_payload                                  # (str) – Payload for custom wildfire format
+        - tunnel_name                                       # (str) – Name for custom tunnel format
+        - tunnel_uri_format                                 # (str) – URI format for custom tunnel format
+        - tunnel_payload                                    # (str) – Payload for custom tunnel format
+        - user_id_name                                      # (str) – Name for custom User-ID format
+        - user_id_uri_format                                # (str) – URI format for custom User-ID format
+        - user_id_payload                                   # (str) – Payload for custom User-ID format
+        - gtp_name                                          # (str) – Name for custom GTP format
+        - gtp_uri_format                                    # (str) – URI format for custom GTP format
+        - gtp_payload                                       # (str) – Payload for custom GTP format
+        - auth_name                                         # (str) – Name for custom auth format
+        - auth_uri_format                                   # (str) – URI format for custom auth format
+        - auth_payload                                      # (str) – Payload for custom auth format
+        - sctp_name                                         # (str) – (PAN-OS 8.1+) Name for custom SCTP format
+        - sctp_uri_format                                   # (str) – (PAN-OS 8.1+) URI format for custom SCTP format
+        - sctp_payload                                      # (str) – (PAN-OS 8.1+) Payload for custom SCTP format
+        - iptag_name                                        # (str) – (PAN-OS 9.0+) Name for custom IP tag format
+        - iptag_uri_format                                  # (str) – (PAN-OS 9.0+) URI format for custom IP tag format
+        - iptag_payload                                     # (str) – (PAN-OS 9.0+) Payload for custom IP tag format
+      children:
+        - name: http_server
+        - name: http_auth_header
+        - name: http_auth_param
+        - name: http_config_header
+        - name: http_config_param
+        - name: http_data_header
+        - name: http_data_param
+        - name: http_gtp_header
+        - name: http_gtp_param
+        - name: http_hip_match_header
+        - name: http_hip_match_param
+        - name: http_ip_tag_header
+        - name: http_ip_tag_param
+        - name: http_sctp_header
+        - name: http_sctp_param
+        - name: http_system_header
+        - name: http_system_param
+        - name: http_threat_header
+        - name: http_threat_param
+        - name: http_traffic_header
+        - name: http_traffic_param
+        - name: http_tunnel_header
+        - name: http_tunnel_param
+        - name: http_url_header
+        - name: http_url_param
+        - name: http_user_id_header
+        - name: http_user_id_param
+        - name: http_wildfire_header
+        - name: http_wildfire_param
+    password_profile:
+      module: panos.device
+      class: PasswordProfile
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) - Password profile name
+        - expiration                                        # (int) - Number of days until the password expires
+        - warning                                           # (int) - Number of days warning before password expires
+        - login_count                                       # (int) - Post expiration admin login count
+        - grace_period                                      # (int) - Post expiration grace period
+    snmp_server_profile:
+      module: panos.device
+      class: SnmpServerProfile
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str): The name
+        - version                                           # (str): SNMP version.  Valid values are v2c (default) or v3
+      children:
+        - name: snmp_v2c_server
+        - name: snmp_v3_server
+    syslog_server_profile:
+      module: panos.device
+      class: SyslogServerProfile
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – The name
+        - config                                            # (str) – Custom config log format
+        - system                                            # (str) – Custom system log format
+        - threat                                            # (str) – Custom threat log format
+        - traffic                                           # (str) – Custom traffic log format
+        - hip_match                                         # (str) – Custom HIP match log format
+        - url                                               # (str) – (PAN-OS 8.0+) Custom URL log format
+        - data                                              # (str) – (PAN-OS 8.0+) Custom data log format
+        - wildfire                                          # (str) – (PAN-OS 8.0+) Custom WildFire log format
+        - tunnel                                            # (str) – (PAN-OS 8.0+) Custom tunnel log format
+        - user_id                                           # (str) – (PAN-OS 8.0+) Custom user-ID log format
+        - gtp                                               # (str) – (PAN-OS 8.0+) Custom GTP log format
+        - auth                                              # (str) – (PAN-OS 8.0+) Custom authentication log format
+        - sctp                                              # (str) – (PAN-OS 8.1+) Custom SCTP log format
+        - iptag                                             # (str) – (PAN-OS 9.0+) Custom Iptag log format
+        - escaped_characters                                # (str) – Characters to be escaped
+        - escape_character                                  # (str) – Escape character
+      children:
+        - name: syslog_server
+    system_settings:
+      module: panos.device
+      class: SystemSettings
+      parent: vsys
+      skip: false
+      sort_param: hostname
+      params:
+        - hostname                                          # (str) – The hostname of the device
+        - domain                                            # (str) – The domain of the device
+        - ip_address                                        # (str) – Management interface IP address
+        - netmask                                           # (str) – Management interface netmask
+        - default_gateway                                   # (str) – Management interface default gateway
+        - ipv6_address                                      # (str) – Management interface IPv6 address
+        - ipv6_default_gateway                              # (str) – Management interface IPv6 default gateway
+        - dns_primary                                       # (str) – Primary DNS server IP address
+        - dns_secondary                                     # (str) – Secondary DNS server IP address
+        - timezone                                          # (str) – Device timezone
+        # TODO: add support for panorama stuff at some point…
+        # 'panorama' param returns the following:
+        #     "panorama": "<bound method PanObject.panorama of <SystemSettings 0x1066e7700>>",
+        #- panorama                                          # (str) – IP address of primary Panorama
+        #- panorama2                                         # (str) – IP address of secondary Panorama
+        - login_banner                                      # (str) – Login banner text
+        - update_server                                     # (str) – IP or hostname of the update server
+        - verify_update_server                              # (bool) – Verify the update server identity
+        - dhcp_send_hostname                                # (bool) – (DHCP Mngt) Send Hostname
+        - dhcp_send_client_id                               # (bool) – (DHCP Mngt) Send Client ID
+        - accept_dhcp_hostname                              # (bool) – (DHCP Mngt) Accept DHCP hostname
+        - accept_dhcp_domain                                # (bool) – (DHCP Mngt) Accept DHCP domain name
+      children:
+        - name: ntp_primary
+        - name: ntp_secondary
+        - name: telemetry
+    vsys:
+      module: panos.device
+      class: Vsys
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – Vsys identifier (eg. ‘vsys1’, ‘vsys5’, etc)
+        - display_name                                      # (str) – Friendly name of the vsys
+        - interface                                         # (list) – A list of strings with names of interfaces or a list of panos.network.Interface objects
+        - vlans                                             # (list) – A list of strings of VLANs
+        - virtual_wires                                     # (list) – A list of strings of virtual wires
+        - virtual_routers                                   # (list) – A list of strings of virtual routers
+        - visible_vsys                                      # (list) – A list of strings of the vsys visible
+        - dns_proxy                                         # (str) – DNS Proxy server
+        - decrypt_forwarding                                # (bool) – Allow forwarding of decrypted content
+    vsys_resources:
+      module: panos.device
+      class: VsysResources
+      parent: vsys
+      skip: true
+      sort_param: ~
+      params:
+        - max_security_rules                                # (int) – Maximum security rules
+        - max_nat_rules                                     # (int) – Maximum nat rules
+        - max_ssl_decryption_rules                          # (int) – Maximum ssl decryption rules
+        - max_qos_rules                                     # (int) – Maximum QOS rules
+        - max_application_override_rules                    # (int) – Maximum application override rules
+        - max_pbf_rules                                     # (int) – Maximum policy based forwarding rules
+        - max_cp_rules                                      # (int) – Maximum captive portal rules
+        - max_dos_rules                                     # (int) – Maximum DOS rules
+        - max_site_to_site_vpn_tunnels                      # (int) – Maximum site-to-site VPN tunnels
+        - max_concurrent_ssl_vpn_tunnels                    # (int) – Maximum ssl VPN tunnels
+        - max_sessions                                      # (int) – Maximum sessions
+
+  #############################################################################
+  ################################### NETWORK #################################
+  #############################################################################
+  network:
+    aggregate_interface:
+      module: panos.network
+      class: AggregateInterface
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of interface (eg. ‘ae1’)
+        - mode                                              # (str) – Mode of the interface: layer3, layer2, virtual-wire, ha. Not all modes apply to all interface types (Default: layer3)
+        - ip                                                # (tuple) – Layer3: Interface IPv4 addresses
+        - ipv6_enabled                                      # (bool) – Layer3: IPv6 Enabled (requires IPv6Address child object)
+        - management_profile                                # (str/ManagementProfile) – Layer3: Interface Management Profile
+        - mtu                                               # (int) – Layer3: MTU for interface
+        - adjust_tcp_mss                                    # (bool) – Layer3: Adjust TCP MSS
+        - netflow_profile                                   # (str) – Netflow profile
+        - lldp_enabled                                      # (bool) – Enable LLDP
+        - lldp_profile                                      # (str) – Reference to an lldp profile
+        - comment                                           # (str) – The interface’s comment
+        - ipv4_mss_adjust                                   # (int) – Layer3: TCP MSS adjustment for ipv4
+        - ipv6_mss_adjust                                   # (int) – Layer3: TCP MSS adjustment for ipv6
+        - enable_dhcp                                       # (bool) – Enable DHCP on this interface
+        - create_dhcp_default_route                         # (bool) – Layer3: Create default route pointing to default gateway provided by server
+        - dhcp_default_route_metric                         # (int) – Layer3: Metric for the DHCP default route
+        - lacp_enable                                       # (bool) – Enables LACP
+        - lacp_passive_pre_negotiation                      # (bool) – Enable LACP passive pre-negotiation, off by default
+        - lacp_rate                                         # (str) – Set LACP transmission-rate to ‘fast’ or ‘slow’
+        - lacp_mode                                         # (str) – Set LACP mode to ‘active’ or ‘passive’
+      children:
+        - name: arp
+        - name: ipv6_address
+        - name: layer2_subinterface
+        - name: layer3_subinterface
+          children:
+            - name: arp
+            - name: ipv6_address
+    ethernet_interface:
+      module: panos.network
+      class: EthernetInterface
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of interface (eg. ‘ethernet1/1’)
+        - mode                                              # (str) – Mode of the interface: layer3, layer2, virtual-wire, ha, tap, decrypt-mirror, aggregate-group. Not all modes apply to all interface types (Default: layer3)
+        - ip                                                # (tuple) – Layer3: Interface IPv4 addresses
+        - ipv6_enabled                                      # (bool) – Layer3: IPv6 Enabled (requires IPv6Address child object)
+        - management_profile                                # (str/ManagementProfile) – Layer3: Interface Management Profile
+        - mtu                                               # (int) – Layer3: MTU for interface
+        - adjust_tcp_mss                                    # (bool) – Layer3: Adjust TCP MSS
+        - netflow_profile                                   # (str) – Netflow profile
+        - lldp_enabled                                      # (bool) – Layer2: Enable LLDP
+        - lldp_profile                                      # (str) – Layer2: Reference to an lldp profile
+        - netflow_profile_l2                                # (str) – Netflow profile
+        - link_speed                                        # (str) – Link speed: eg. auto, 10, 100, 1000
+        - link_duplex                                       # (str) – Link duplex: eg. auto, full, half
+        - link_state                                        # (str) – Link state: eg. auto, up, down
+        - aggregate_group                                   # (str) – Aggregate interface (eg. ae1)
+        - comment                                           # (str) – The interface’s comment
+        - ipv4_mss_adjust                                   # (int) – (PAN-OS 7.1+) TCP MSS adjustment for ipv4
+        - ipv6_mss_adjust                                   # (int) – (PAN-OS 7.1+) TCP MSS adjustment for ipv6
+        - enable_dhcp                                       # (bool) – Enable DHCP on this interface
+        - create_dhcp_default_route                         # (bool) – Create default route pointing to default gateway provided by server
+        - dhcp_default_route_metric                         # (int) – Metric for the DHCP default route
+        - enable_untagged_subinterface                      # (bool) – (PAN-OS 7.1+) Enable untagged subinterface
+        - decrypt_forward                                   # (bool) – (PAN-OS 8.1+) Decrypt forward.
+        - rx_policing_rate                                  # (int) – (PAN-OS 8.1+) Receive policing rate
+        - tx_policing_rate                                  # (int) – (PAN-OS 8.1+) Transmit policing rate
+        - dhcp_send_hostname_enable                         # (bool) – Enable send firewall or custom hostname to DHCP server
+        - dhcp_send_hostname_value                          # (string) – Set interface hostname
+      children:
+        - name: arp
+        - name: ipv6_address
+        - name: layer2_subinterface
+        - name: layer3_subinterface
+          children:
+            - name: arp
+            - name: ipv6_address
+    gre_tunnel:
+      module: panos.network
+      class: GreTunnel
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – GRE tunnel name.
+        - interface                                         # (str) – Interface to terminate tunnel.
+        - local_address_type                                # (str) – Type of local address. Can be “ip” (default) or “floating-ip”.
+        - local_address_value                               # (str) – IP address value.
+        - peer_address                                      # (str) – Peer IP address.
+        - tunnel_interface                                  # (str) – To apply GRE tunnels to tunnel interface.
+        - ttl                                               # (int) – TTL.
+        - copy_tos                                          # (bool) – Copy IP TOS bits from inner packet to GRE packet.
+        - enable_keep_alive                                 # (bool) – Enable tunnel monitoring.
+        - keep_alive_interval                               # (int) – Interval.
+        - keep_alive_retry                                  # (int) – Retry.
+        - keep_alive_hold_timer                             # (int) – Hold timer.
+        - disabled                                          # (bool) – Disable the GRE tunnel.
+    ike_crypto_profile:
+      module: panos.network
+      class: IkeCryptoProfile
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – IKE crypto profile name
+        - dh_group                                          # (string/list) – phase-1 DH group: group1, group2, group5, group14, group19 (7.0+), or group20 (7.0+).
+        - authentication                                    # (string/list) – hashing algorithm: md5, sha1, sha256, sha384, or sha512.
+        - encryption                                        # (string/list) – encryption algorithm: des (7.1+), 3des, aes128 / aes-128-cbc, aes192 / aes-192-cbc, or aes256 / aes-256-cbc. If you need to be able to work with older than 7.0 firewalls, then use set_encryption().
+        - lifetime_seconds                                  # (int) – IKE SA lifetime in seconds
+        - lifetime_minutes                                  # (int) – IKE SA lifetime in minutes
+        - lifetime_hours                                    # (int) – IKE SA lifetime in hours
+        - lifetime_days                                     # (int) – IKE SA lifetime in days
+        - authentication_multiple                           # (int) – (7.0+) IKEv2 SA reauthentication interval equals authentication_multiple * lifetime; 0 means reauthentication is disabled.
+    ike_gateway:
+      module: panos.network
+      class: IkeGateway
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – IKE gateway name
+        - version                                           # (str) – (7.0+) ikev1, ikev2, or ikev2-prefered (default: ikev1)
+        - enable_ipv6                                       # (bool) – (7.0+) enable IPv6
+        - disabled                                          # (bool) – (7.0+) disable this object
+        - peer_ip_type                                      # (str) – ip, dynamic, or fqdn (8.1+) (default: ip)
+        - peer_ip_value                                     # (str) – the IP for peer_ip_type of ‘ip’ or ‘fqdn’
+        - interface                                         # (str) – local gateway end-point
+        - local_ip_address_type                             # (str) – ip or floating-ip
+        - local_ip_address                                  # (str) – IP address if interface has multiple addresses
+        - auth_type                                         # (str) – pre-shared-key or certificate (default: pre-shared-key)
+        - pre_shared_key                                    # (str) – The string used as pre-shared key
+        - local_id_type                                     # (str) – ipaddr, fqdn, ufqdn, keyid, or dn
+        - local_id_value                                    # (str) – The value for local_id_type
+        - peer_id_type                                      # (str) – ipaddr, fqdn, ufqdn, keyid, or dn
+        - peer_id_value                                     # (str) – The value for peer_id_type
+        - peer_id_check                                     # (str) – exact or wildcard (default: exact)
+        - local_cert                                        # (str) – Local certificate name
+        - cert_enable_hash_and_url                          # (bool) – (7.0+) Use hash-and-url for local certificate.
+        - cert_base_url                                     # (str) – (7.0+) The host and directory part of URL for local certificates (http only).
+        - cert_use_management_as_source                     # (bool) – (7.0+) Use management interface IP as source to retrieve http certificates
+        - cert_permit_payload_mismatch                      # (bool) – Permit peer identification and certificate payload identification mismatch.
+        - cert_profile                                      # (str) – Local certificate name
+        - cert_enable_strict_validation                     # (bool) – Enable strict valication of peer’s extended key use
+        - enable_passive_mode                               # (bool) – Enable passive mode (responder only)
+        - enable_nat_traversal                              # (bool) – Enable NAT traversal
+        - nat_traversal_keep_alive                          # (int) – sending interval for NAT keep-alive packets (in seconds)
+        - nat_traversal_enable_udp_checksum                 # (bool) – enable UDP checksum
+        - enable_fragmentation                              # (bool) – Enable IKE fragmentation
+        - ikev1_exchange_mode                               # (str) – auto, main, or aggressive
+        - ikev1_crypto_profile                              # (str) – IKE SA crypto oprofile name
+        - enable_dead_peer_detection                        # (bool) – enable Dead-Peer-Detection
+        - dead_peer_detection_interval                      # (int) – sending interval for probing packets (in seconds)
+        - dead_peer_detection_retry                         # (int) – number of retries before disconnection
+        - ikev1_send_commit_bit                             # (bool) – Send commit bit
+        - ikev1_initial_contact                             # (bool) – send initial contact
+        - ikev2_crypto_profile                              # (str) – (7.0+) IKE SE crypto profile name
+        - ikev2_cookie_valication                           # (bool) – (7.0+) require cookie
+        - ikev2_send_peer_id                                # (bool) – (7.0+) send peer ID
+        - enable_liveness_check                             # (bool) – (7.0+) enable sending empty information liveness check message
+        - liveness_check_interval                           # (int) – (7.0+) delay interval before sending probing packets (in seconds)
+    ipsec_crypto_profile:
+      module: panos.network
+      class: IpsecCryptoProfile
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – IPSec crypto profile name
+        - esp_encryption                                    # (string/list) – des, 3des, null, aes128 / aes-128-cbc, aes192 / aes-192-cbc, aes256 / aes-256-cbc, aes-128-gcm (7.0+), or aes-256-gcm (7.0+). If you need to write a script that works older than 7.0 firewalls, then please use set_esp_encryption().
+        - esp_authentication                                # (string/list) – none, md5, sha1, sha256, sha384, or sha512
+        - ah_authentication                                 # (string/list) – md5, sha1, sha256, sha384, or sha512
+        - dh_group                                          # (str) – no-pfs, group1, group2, group5, group14, group19, or group20
+        - lifetime_seconds                                  # (int) – IPSec SA lifetime in seconds
+        - lifetime_minutes                                  # (int) – IPSec SA lifetime in minutes
+        - lifetime_hours                                    # (int) – IPSec SA lifetime in hours
+        - lifetime_days                                     # (int) – IPSec SA lifetime in days
+        - lifesize_kb                                       # (int) – IPSec SA lifesize in kilobytes (KB)
+        - lifesize_mb                                       # (int) – IPSec SA lifesize in megabytes (MB)
+        - lifesize_gb                                       # (int) – IPSec SA lifesize in gigabytes (GB)
+        - lifesize_tb                                       # (int) – IPSec SA lifesize in terabytes (TB)
+    ipsec_tunnel:
+      module: panos.network
+      class: IpsecTunnel
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – IPSec tunnel name
+        - tunnel_interface                                  # (str) – apply IPSec VPN tunnels to tunnel interface
+        - ipv6                                              # (bool) – (7.0+) use IPv6 for the IPSec tunnel
+        - type                                              # (str) – auto-key (default), manual-key, or global-protect-satellite
+        - ak_ike_gateway                                    # (string/list) – IKE gateway name
+        - ak_ipsec_crypto_profile                           # (str) – IPSec crypto profile name
+        - mk_local_spi                                      # (str) – outbound SPI in hex
+        - mk_interface                                      # (str) – interface to terminate tunnel
+        - mk_remote_spi                                     # (str) – inbound SPI in hex
+        - mk_remote_address                                 # (str) – tunnel peer IP address
+        - mk_local_address_ip                               # (str) – exact IP address if interface has multiple IP addresses
+        - mk_local_address_floating_ip                      # (str) – floating IP address in HA Active-Active configuration
+        - mk_protocol                                       # (str) – esp or ah
+        - mk_auth_type                                      # (str) – md5, sha1, sha256, sha384, or sha512
+        - mk_auth_key                                       # (str) – the key for the given mk_auth_type
+        - mk_esp_encryption                                 # (str) – des, 3des, aes128 / aes-128-cbc, aes192 / aes-192-cbc, aes256 / aes-256-cbc, or null. The various “aes” options changed in version 7.0 onward. If you need to make a script that is compatible with 6.1 PANOS, then use “set_mk_esp_encryption()”. Passing it either “aes128” or “aes-128-cbc” will have it set the appropriate string for the given version.
+        - mk_esp_encryption_key                             # (str) – The ESP encryption key for mk_esp_encryption type
+        - gps_portal_address                                # (str) – GlobalProtect portal address
+        - gps_prefer_ipv6                                   # (bool) – (8.0+) perfer to register portal in IPv6
+        - gps_interface                                     # (str) – interface to communicate with portal
+        - gps_interface_ipv4_ip                             # (str) – exact IPv4 IP address if interface has multiple IP addresses
+        - gps_interface_ipv6_ip                             # (str) – (8.0+) exact IPv6 IP address if interface has multiple IP addresses
+        - gps_interface_ipv4_floating_ip                    # (str) – (7.0+) floating IPv4 IP address in HA Active-Active configuration
+        - gps_interface_ipv6_floating_ip                    # (str) – (8.0+) floating IPv6 IP address in HA Active-Active configuration
+        - gps_publish_connected_routes                      # (bool) – enable publishing of connected and static routes
+        - gps_publish_routes                                # (str/list) – specify list of routes to publish to GlobalProtect gateway
+        - gps_local_certificate                             # (str) – GlobalProtect satellite certificate file name
+        - gps_certificate_profile                           # (str) – profile for authenticating GlobalProtect gateway certificates
+        - anti_replay                                       # (bool) – enable anti-replay check on this tunnel
+        - copy_tos                                          # (bool) – copy IP TOS bits from inner packet to IPSec packet (not recommended)
+        - copy_flow_label                                   # (bool) – (7.0+) copy IPv6 flow label for 6in6 tunnel from inner packet to IPSec packet (not recommended)
+        - enable_tunnel_monitor                             # (bool) – enable tunnel monitoring on this tunnel
+        - tunnel_monitor_dest_ip                            # (str) – destination IP to send ICMP probe
+        - tunnel_monitor_proxy_id                           # (str) – (7.0+) which proxy-id (or proxy-id-v6) the monitoring traffic will use
+        - tunnel_monitor_profile                            # (str) – monitoring action
+        - disabled                                          # (bool) – (7.0+) disable the IPSec tunnel
+      children:
+        - name: ipsec_tunnel_ipv4_proxy_id
+        - name: ipsec_tunnel_ipv6_proxy_id
+    loopback_interface:
+      module: panos.network
+      class: LoopbackInterface
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) - Interface name
+        - ip                                                # (tuple) – Interface IPv4 addresses
+        - ipv6_enabled                                      # (bool) – IPv6 Enabled (requires IPv6Address child object)
+        - management_profile                                # (str/ManagementProfile) – Interface Management Profile
+        - mtu                                               # (int) – MTU for interface
+        - adjust_tcp_mss                                    # (bool) – Adjust TCP MSS
+        - netflow_profile                                   # (str) – Netflow profile
+        - comment                                           # (str) – The interface’s comment
+        - ipv4_mss_adjust                                   # (int) – TCP MSS adjustment for ipv4
+        - ipv6_mss_adjust                                   # (int) – TCP MSS adjustment for ipv6
+      children:
+        - name: ipv6_address
+    management_profile:
+      module: panos.network
+      class: ManagementProfile
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) - name of profile
+        - ping                                              # (bool) – Enable ping
+        - telnet                                            # (bool) – Enable telnet
+        - ssh                                               # (bool) – Enable ssh
+        - http                                              # (bool) – Enable http
+        - http_ocsp                                         # (bool) – Enable http-ocsp
+        - https                                             # (bool) – Enable https
+        - snmp                                              # (bool) – Enable snmp
+        - response_pages                                    # (bool) – Enable response pages
+        - userid_service                                    # (bool) – Enable userid service
+        - userid_syslog_listener_ssl                        # (bool) – Enable userid syslog listener ssl
+        - userid_syslog_listener_udp                        # (bool) – Enable userid syslog listener udp
+        - permitted_ip                                      # (list) – The list of permitted IP addresses
+    tunnel_interface:
+      module: panos.network
+      class: TunnelInterface
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) - Interface name
+        - ip                                                # (tuple) – Interface IPv4 addresses
+        - ipv6_enabled                                      # (bool) – IPv6 Enabled (requires IPv6Address child object)
+        - management_profile                                # (str/ManagementProfile) – Interface Management Profile
+        - mtu                                               # (int) – MTU for interface
+        - netflow_profile                                   # (str) – Netflow profile
+        - comment                                           # (str) – The interface’s comment
+      children:
+        - name: ipv6_address
+    virtual_router:
+      module: panos.network
+      class: VirtualRouter
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of virtual router (Default: “default”)
+        - interface                                         # (list) – List of interface names
+        - ad_static                                         # (int) – Administrative distance for this protocol
+        - ad_static_ipv6                                    # (int) – Administrative distance for this protocol
+        - ad_ospf_int                                       # (int) – Administrative distance for this protocol
+        - ad_ospf_ext                                       # (int) – Administrative distance for this protocol
+        - ad_ospfv3_int                                     # (int) – Administrative distance for this protocol
+        - ad_ospfv3_ext                                     # (int) – Administrative distance for this protocol
+        - ad_ibgp                                           # (int) – Administrative distance for this protocol
+        - ad_ebgp                                           # (int) – Administrative distance for this protocol
+        - ad_rip                                            # (int) – Administrative distance for this protocol
+      children:
+        - name: bgp
+          children:
+            - name: bgp_auth_profile
+            - name: bgp_dampening_profile
+            - name: bgp_peer_group
+              children:
+                - name: bgp_peer
+            - name: bgp_policy_aggregation_address
+              children:
+                - name: bgp_policy_advertise_filter
+                  children:
+                    - name: bgp_policy_address_prefix
+                - name: bgp_policy_suppress_filter
+                  children:
+                    - name: bgp_policy_address_prefix
+            - name: bgp_policy_conditional_advertisement
+              children:
+                - name: bgp_policy_advertise_filter
+                  children:
+                    - name: bgp_policy_address_prefix
+                - name: bgp_policy_non_exist_filter
+                  children:
+                    - name: bgp_policy_address_prefix
+            - name: bgp_policy_export_rule
+              children:
+                - name: bgp_policy_address_prefix
+            - name: bgp_policy_import_rule
+              children:
+                - name: bgp_policy_address_prefix
+            - name: bgp_redistribution_rule
+            - name: bgp_routing_options
+              children:
+                - name: bgp_outbound_route_filter
+        - name: ospf
+          children:
+            - name: ospf_area
+              children:
+                - name: ospf_area_interface
+                  children:
+                    - name: ospf_neighbor
+                - name: ospf_nssa_external_range
+                - name: ospf_range
+            - name: ospf_auth_profile
+              children:
+                - name: ospf_auth_profile_md5
+            - name: ospf_export_rules
+        - name: redistribution_profile_v4
+        - name: redistribution_profile_v6
+        - name: static_route_v4
+          children:
+            - name: path_monitor_destination
+        - name: static_route_v6
+          children:
+            - name: path_monitor_destination
+    virtual_wire:
+      module: panos.network
+      class: VirtualWire
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – The vwire name
+        - tag                                               # (int) – Tag for the interface, aka vlan id
+        - interface1                                        # (str) – The first interface to use
+        - interface2                                        # (str) – The second interface to use
+        - multicast                                         # (bool) – Enable multicast firewalling or not
+        - pass_through                                      # (bool) – Enable link state pass through or not
+    vlan:
+      module: panos.network
+      class: Vlan
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) - Interface name
+        - interface                                         # (list) – List of interface names
+        - virtual-interface                                 # (VlanInterface) – The layer3 vlan interface for this vlan
+    vlan_interface:
+      module: panos.network
+      class: VlanInterface
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) - Interface name
+        - ip                                                # (tuple) – Interface IPv4 addresses
+        - ipv6_enabled                                      # (bool) – IPv6 Enabled (requires IPv6Address child object)
+        - management_profile                                # (str/ManagementProfile) – Interface Management Profile
+        - mtu                                               # (int) – MTU for interface
+        - adjust_tcp_mss                                    # (bool) – Adjust TCP MSS
+        - netflow_profile                                   # (str) – Netflow profile
+        - comment                                           # (str) – The interface’s comment
+        - ipv4_mss_adjust                                   # (int) – TCP MSS adjustment for ipv4
+        - ipv6_mss_adjust                                   # (int) – TCP MSS adjustment for ipv6
+        - enable_dhcp                                       # (bool) – Enable DHCP on this interface
+        - create_dhcp_default_route                         # (bool) – Create default route pointing to default gateway provided by server
+        - dhcp_default_route_metric                         # (int) – Metric for the DHCP default route
+      children:
+        - name: ipv6_address
+    zone:
+      module: panos.network
+      class: Zone
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of the zone
+        - mode                                              # (str) – The mode of the security zone. Must match the mode of the interface. Possible values: tap, virtual-wire, layer2, layer3, external
+        - interface                                         # (list) – List of interface names or instantiated subclasses of panos.network.Interface.
+        - zone_profile                                      # (str) – Zone protection profile
+        - log_setting                                       # (str) – Log forwarding setting
+        - enable_user_identification                        # (bool) – If user identification is enabled
+        - include_acl                                       # (list/str) – User identification ACL include list
+        - exclude_acl                                       # (list/str) – User identification ACL exclude list
+
+  #############################################################################
+  ################################### OBJECTS #################################
+  #############################################################################
+  objects:
+    address_group:
+      module: panos.objects
+      class: AddressGroup
+      parent: vsys
+      skip: false
+      sort_param: name
+      params: 
+        - name                                              # (str) - Name of the address group
+        - static_value                                      # (list) - Values for a static address group
+        - dynamic_value                                     # (str) - Registered-ip tags for a dynamic address group
+        - description                                       # (str) - Description of this object
+        - tag                                               # (list) - Administrative tags (not to be confused with registered-ip tags)
+    address_object:
+      module: panos.objects
+      class: AddressObject
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) - Name of the object
+        - value                                             # (str) - IP address or other value of the object
+        - type                                              # (str) - Type of address: * ip-netmask (default) * ip-range * ip-wildcard (added in PAN-OS 9.0) * fqdn
+        - description                                       # (str) - Description of this object
+        - tag                                               # (list) - Administrative tags
+    application_container:
+      module: panos.objects
+      class: ApplicationContainer
+      parent: vsys
+      skip: true
+      sort_param: null
+      params:
+        - applications                                      # (list) - List of memeber applications
+    application_filter:
+      module: panos.objects
+      class: ApplicationFilter
+      parent: vsys
+      skip: true
+      sort_param: name
+      params:
+        - name                                              # (str) - Name of the object
+        - category                                          # (list) – Application category
+        - subcategory                                       # (list) – Application subcategory
+        - technology                                        # (list) – Application technology
+        - risk                                              # (list) – Application risk
+        - evasive                                           # (bool) –
+        - excessive_bandwidth_use                           # (bool) –
+        - prone_to_misuse                                   # (bool) –
+        - is_saas                                           # (bool) –
+        - transfers_files                                   # (bool) –
+        - tunnels_other_apps                                # (bool) –
+        - used_by_malware                                   # (bool) –
+        - has_known_vulnerabilities                         # (bool) –
+        - pervasive                                         # (bool) –
+        - tag                                               # (list) – Administrative tags
+    application_group:
+      module: panos.objects
+      class: ApplicationGroup
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of the object
+        - value                                             # (list) – List of application values
+        - tag                                               # (list) – Administrative tags
+    application_object:
+      module: panos.objects
+      class: ApplicationObject
+      parent: vsys
+      skip: true
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of the object
+        - category                                          # (str) – Application category
+        - subcategory                                       # (str) – Application subcategory
+        - technology                                        # (str) – Application technology
+        - risk                                              # (int) – Risk (1-5) of the application
+        - default_type                                      # (str) – Default identification type of the application
+        - default_value                                     # (list) – Values for the default type
+        - parent_app                                        # (str) – Parent Application for which this app falls under
+        - timeout                                           # (int) – Default timeout
+        - tcp_timeout                                       # (int) – TCP timeout
+        - udp_timeout                                       # (int) – UDP timeout
+        - tcp_half_closed_timeout                           # (int) – TCP half closed timeout
+        - tcp_time_wait_timeout                             # (int) – TCP wait time timeout
+        - evasive_behavior                                  # (bool) – Applicaiton is actively evasive
+        - consume_big_bandwidth                             # (bool) – Application uses large bandwidth
+        - used_by_malware                                   # (bool) – Application is used by malware
+        - able_to_transfer_file                             # (bool) – Application can do file transfers
+        - has_known_vulnerability                           # (bool) – Application has known vulnerabilities
+        - tunnel_other_application                          # (bool) –
+        - tunnel_applications                               # (list) – List of tunneled applications
+        - prone_to_misuse                                   # (bool) –
+        - pervasive_use                                     # (bool) –
+        - file_type_ident                                   # (bool) –
+        - virus_ident                                       # (bool) –
+        - data_ident                                        # (bool) –
+        - description                                       # (str) – Description of this object
+        - tag                                               # (list) – Administrative tags
+    custom_url_category:
+      module: panos.objects
+      class: CustomUrlCategory
+      parent: vsys
+      skip: true
+      sort_param: name
+      params:
+        - name                                              # (str) – The name
+        - url_value                                         # (list) – Values to include in custom URL category object
+        - description                                       # (str) – Description of this object
+    dynamic_user_group:
+      module: panos.objects
+      class: DynamicUserGroup
+      parent: vsys
+      skip: true
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of the dynamic user group
+        - description                                       # (str) – Description of this object
+        - filter                                            # (str) – Tag-based filter.
+        - tag                                               # (list) – Administrative tags
+    log_forwarding_profile:
+      module: panos.objects
+      class: LogForwardingProfile
+      parent: vsys
+      skip: true
+      sort_param: name
+      params:
+        - name                                              # (str) – The name
+        - description                                       # (str) – The description
+        - enhanced_logging                                  # (bool) – (PAN-OS 8.1+) Enabling enhanced application logging
+      children:
+        - name: log_forwarding_profile_match_list
+          children:
+            - name: log_forwarding_profile_match_list_action
+    region:
+      module: panos.objects
+      class: Region
+      parent: vsys
+      skip: true
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of the region
+        - address                                           # (list) – List of IP networks
+        - latitude                                          # (float) – Latitude of the region
+        - longitude                                         # (float) – Longitude of the region
+    schedule_object:
+      module: panos.objects
+      class: ScheduleObject
+      parent: vsys
+      skip: true
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of the object
+        - disable_override                                  # (bool) – “True” to set disable-override
+        - type                                              # (str) – Type of Schedule: “recurring” or “non-recurring”
+        - non_recurring_date_time                           # (list/str) – “Date and Time Range” string for a non-recurring schedule
+        - recurrence                                        # (str) – “daily” or “weekly” recurrence
+        - daily_time                                        # (list/str) – “Time Range” for a daily recurring schedule
+        - weekly_sunday_time                                # (list/str) – “Time Range” for a weekly recurring schedule (Sunday)
+        - weekly_monday_time                                # (list/str) – “Time Range” for a weekly recurring schedule (Monday)
+        - weekly_tuesday_time                               # (list/str) – “Time Range” for a weekly recurring schedule (Tuesday)
+        - weekly_wednesday_time                             # (list/str) – “Time Range” for a weekly recurring schedule (Wednesday)
+        - weekly_thursday_time                              # (list/str) – “Time Range” for a weekly recurring schedule (Thursday)
+        - weekly_friday_time                                # (list/str) – “Time Range” for a weekly recurring schedule (Friday)
+        - weekly_saturday_time                              # (list/str) – “Time Range” for a weekly recurring schedule (Saturday)
+    security_profile_group:
+      module: panos.objects
+      class: SecurityProfileGroup
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – The group name
+        - virus                                             # (str) – Antivirus profile
+        - spyware                                           # (str) – Anti-spyware profile
+        - vulnerability                                     # (str) – Vulnerability protection profile
+        - url_filtering                                     # (str) – URL filtering profile
+        - file_blocking                                     # (str) – File blocking profile
+        - data_filtering                                    # (str) – Data filtering profile
+        - wildfire_analysis                                 # (str) – WildFire analysis profile
+    service_group:
+      module: panos.objects
+      class: ServiceGroup
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of the object
+        - value                                             # (list) – List of service values
+        - tag                                               # (list) – Administrative tags
+    service_object:
+      module: panos.objects
+      class: ServiceObject
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of the object
+        - protocol                                          # (str) – Protocol of the service, either tcp or udp
+        - source_port                                       # (str) – Source port of the protocol, if any
+        - destination_port                                  # (str) – Destination port of the service
+        - description                                       # (str) – Description of this object
+        - tag                                               # (list) – Administrative tags
+    tag:
+      module: panos.objects
+      class: Tag
+      parent: vsys
+      skip: false
+      sort_param: name
+      params:
+        - name                                              # (str) – Name of the tag
+        - color                                             # (str) – Color ID (eg. ‘color1’, ‘color4’, etc). You can use color_code() to generate the ID.
+        - comments                                          # (str) – Comments
+      # accepted color strings for color_code() method
+      # "red": 1, "green": 2, "blue": 3, "yellow": 4, "copper": 5, "orange": 6,
+      # "purple": 7, "gray": 8, "light green": 9, "cyan": 10, "light gray": 11,
+      # "blue gray": 12, "lime": 13, "black": 14, "gold": 15, "brown": 16,
+      # "olive": 17, # there is no color18 "maroon": 19, "red-orange": 20,
+      # "yellow-orange": 21, "forest green": 22, "turquoise blue": 23,
+      # "azure blue": 24, "cerulean blue": 25, "midnight blue": 26, 
+      # "medium blue": 27, "cobalt blue": 28, "violet blue": 29, 
+      # "blue violet": 30, "medium violet": 31, "medium rose": 32, 
+      # "lavender": 33, "orchid": 34, "thistle": 35, "peach": 36, "salmon": 37,
+      # "magenta": 38, "red violet": 39, "mahogany": 40, "burnt sienna": 41,
+      # "chestnut": 42,
+
+  #############################################################################
+  ################################## POLICIES  ################################
+  #############################################################################
+  policies:
+    nat_rule:
+      module: panos.policies
+      class: NatRule
+      parent: rulebase
+      skip: false
+      sort_param: null # don't sort, order matters
+      params:
+        - name                                              # (str) – Name of the rule
+        - description                                       # (str) – The description
+        - nat_type                                          # (str) – Type of NAT
+        - fromzone                                          # (list) – From zones
+        - tozone                                            # (list) – To zones
+        - to_interface                                      # (str) – Egress interface from route lookup
+        - service                                           # (str) – The service
+        - source                                            # (list) – Source addresses
+        - destination                                       # (list) – Destination addresses
+        - source_translation_type                           # (str) – Type of source address translation
+        - source_translation_address_type                   # (str) – Address type for Dynamic IP And Port or Dynamic IP source translation types
+        - source_translation_interface                      # (str) – Interface of the source address translation for Dynamic IP and Port source translation types
+        - source_translation_ip_address                     # (str) – IP address of the source address translation for Dynamic IP and Port source translation types
+        - source_translation_translated_addresses           # (list) – Translated addresses of the source address translation for Dynamic IP And Port or Dynamic IP source translation types
+        - source_translation_fallback_type                  # (str) – Type of fallback for Dynamic IP source translation types
+        - source_translation_fallback_translated_addresses  # (list) – Addresses for translated address types of fallback source translation
+        - source_translation_fallback_interface             # (str) – The interface for the fallback source translation
+        - source_translation_fallback_ip_type               # (str) – The type of the IP address for the fallback source translation IP address
+        - source_translation_fallback_ip_address            # (str) – The IP address of the fallback source translation
+        - source_translation_static_translated_address      # (str) – The IP address for the static source translation
+        - source_translation_static_bi_directional          #(bool) – Allow reverse translation from translated address to original address
+        - destination_translated_address                    # (str) – Translated destination IP address
+        - destination_translated_port                       # (int) – Translated destination port number
+        - ha_binding                                        # (str) – Device binding configuration in HA Active-Active mode
+        - disabled                                          # (bool) – Disable this rule
+        - negate_target                                     # (bool) – Target all but the listed target firewalls (applies to panorama/device groups only)
+        - target                                            # (list) – Apply this policy to the listed firewalls only (applies to panorama/device groups only)
+        - tag                                               # (list) – Administrative tags
+        - uuid                                              # (str) – (PAN-OS 9.0+) The UUID for this rule.
+    policy_based_forwarding:
+      module: panos.policies
+      class: PolicyBasedForwarding
+      parent: rulebase
+      skip: false
+      sort_param: null # don't sort, order matters
+      params:
+        - name                                              # (str) – The name
+        - description                                       # (str) – The descripton
+        - tags                                              # (str/list) – List of tags
+        - from_type                                         # (str) – Source from type. Valid values are ‘zone’ (default) or ‘interface’.
+        - from_values                                       # (str/list) – The source values for the given type.
+        - source_addresses                                  # (str/list) – List of source IP addresses.
+        - source_users                                      # (str/list) – List of source users.
+        - negate_source                                     # (bool) – Set to negate the source.
+        - destination_addresses                             # (str/list) – List of destination addresses.
+        - negate_destination                                # (bool) – Set to negate the destination.
+        - applications                                      # (str/list) – List of applications.
+        - services                                          # (str/list) – List of services.
+        - schedule                                          # (str) – The schedule.
+        - disabled                                          # (bool) – Set to disable this rule.
+        - action                                            # (str) – The action to take. Valid values are ‘forward’ (default), ‘forward-to-vsys’, ‘discard’, or ‘no-pbf’.
+        - forward_vsys                                      # (str) – The vsys to forward to if action is set to forward to a vsys.
+        - forward_egress_interface                          # (str) – The egress interface.
+        - forward_next_hop_type                             # (str) – The next hop type. Valid values are ‘ip-address’, ‘fqdn’, or None (default).
+        - forward_next_hop_value                            # (str) – The next hop value if the forward next hop type is not None.
+        - forward_monitor_profile                           # (str) – The monitor profile to use.
+        - forward_monitor_ip_address                        # (str) – The monitor IP address.
+        - forward_monitor_disable_if_unreachable            # (bool) – Set to disable this rule if nexthop / monitor IP is unreachable.
+        - enable_enforce_symmetric_return                   # (bool) – Set to enforce symmetric return.
+        - symmetric_return_addresses                        # (str/list) – List of symmetric return addresses.
+        - target                                            # (list) – Apply this policy to the listed firewalls only (applies to panorama/device groups only)
+        - negate_target                                     # (bool) – Target all but the listed target firewalls (applies to panorama/device groups only)
+        - uuid                                              # (str) – (PAN-OS 9.0+) The UUID for this rule.
+    security_rule:
+      module: panos.policies
+      class: SecurityRule
+      parent: rulebase
+      skip: false
+      sort_param: null # don't sort, order matters
+      params:
+        - name                                              # (str) – Name of the rule
+        - fromzone                                          # (list) – From zones
+        - tozone                                            # (list) – To zones
+        - source                                            # (list) – Source addresses
+        - source_user                                       # (list) – Source users and groups
+        - hip_profiles                                      # (list) – GlobalProtect host integrity profiles
+        - destination                                       # (list) – Destination addresses
+        - application                                       # (list) – Applications
+        - service                                           # (list) – Destination services (ports) (Default: application-default)
+        - category                                          # (list) – Destination URL Categories
+        - action                                            # (str) – Action to take (deny, allow, drop, reset-client, reset-server, reset-both) Note: Not all options are available on all PAN-OS versions.
+        - log_setting                                       # (str) – Log forwarding profile
+        - log_start                                         # (bool) – Log at session start
+        - log_end                                           # (bool) – Log at session end
+        - description                                       # (str) – Description of this rule
+        - type                                              # (str) – ‘universal’, ‘intrazone’, or ‘intrazone’ (Default: universal)
+        - tag                                               # (list) – Administrative tags
+        - negate_source                                     # (bool) – Match on the reverse of the ‘source’ attribute
+        - negate_destination                                # (bool) – Match on the reverse of the ‘destination’ attribute
+        - disabled                                          # (bool) – Disable this rule
+        - schedule                                          # (str) – Schedule Profile
+        - icmp_unreachable                                  # (bool) – Send ICMP Unreachable
+        - disable_server_response_inspection                # (bool) – Disable server response inspection
+        - group                                             # (str) – Security Profile Group
+        - virus                                             # (str) – Antivirus Security Profile
+        - spyware                                           # (str) – Anti-Spyware Security Profile
+        - vulnerability                                     # (str) – Vulnerability Protection Security Profile
+        - url_filtering                                     # (str) – URL Filtering Security Profile
+        - file_blocking                                     # (str) – File Blocking Security Profile
+        - wildfire_analysis                                 # (str) – Wildfire Analysis Security Profile
+        - data_filtering                                    # (str) – Data Filtering Security Profile
+        - negate_target                                     # (bool) – Target all but the listed target firewalls (applies to panorama/device groups only)
+        - target                                            # (list) – Apply this policy to the listed firewalls only (applies to panorama/device groups only)
+        - uuid                                              # (str) – (PAN-OS 9.0+) The UUID for this rule.
+
 ###############################################################################
-################################### DEVICE  ###################################
+################################## CHILDREN ###################################
 ###############################################################################
-device:
-  administrator:
-    module: panos.device
-    class: Administrator
-    parent: fw
-    skip: false
+children:
+  arp:
+    module: panos.network
+    class: Arp
+    sort_param: ip
+    params:
+      - ip                                                  # (str) – The IP address
+      - hw_address                                          # (str) – The MAC address for the static ARP
+      - interface                                           # (str) – The interface (when attached to VlanInterface only)
+  bgp:
+    module: panos.network
+    class: Bgp
+    sort_param: ~
+    params:
+      - enable                                              # (bool) – Enable BGP (Default: True)
+      - router_id                                           # (str) – Router ID in IP format (eg. 1.1.1.1)
+      - reject_default_route                                # (bool) – Reject default route
+      - allow_redist_default_route                          # (bool) – Allow redistribution in default route
+      - install_route                                       # (bool) – Populate BGP learned route to global route table
+      - ecmp_multi_as                                       # (bool) – Support multiple AS in ECMP
+      - enforce_first_as                                    # (bool) – Enforce First AS for EBGP
+      - local_as                                            # (int) – local AS number
+      - global_bfd_profile                                  # (str) – BFD Profile
+  bgp_auth_profile:
+    module: panos.network
+    class: BgpAuthProfile
     sort_param: name
     params:
-      - name                                              # (str) – Admin name
-      - authentication_profile                            # (str) – The authentication profile
-      - web_client_cert_only                              # (bool) – Use only client certificate authentication (Web)
-      - superuser                                         # (bool) – Admin type - superuser
-      - superuser_read_only                               # (bool) – Admin type - superuser, read only
-      - panorama_admin                                    # (bool) – Panonrama - a panorama admin only
-      - device_admin                                      # (bool) – Admin type - device admin
-      - device_admin_read_only                            # (bool) – Admin type - device admin, read only
-      - vsys                                              # (list/str) – Physical firewalls: the vsys this admin should manage
-      - vsys_read_only                                    # (list/str) – Physical firewalls: the vsys this read only admin should manage
-      - ssh_public_key                                    # (str) – Use Public Key Authentication (SSH)
-      - role_profile                                      # (str) – The role based profile
-      - password_hash                                     # (encrypted str) – The encrypted password
-      - password_profile                                  # (str) – The password profile for this user  
-  
-  # TODO: Fix EmailServerProfile + EmailServer. Does not work…
+      - name                                                # (str) – Name of Auth Profile
+      - secret                                              # (str) – shared secret for the TCP MD5 authentication.
+  bgp_dampening_profile:
+    module: panos.network
+    class: BgpDampeningProfile
+    sort_param: name
+    params:
+      - name                                                # (str) – Name of Dampening Profile
+      - enable                                              # (bool) – Enable profile (Default: True)
+      - cutoff                                              # (float) – Cutoff threshold value
+      - reuse                                               # (float) – Reuse threshold value
+      - max_hold_time                                       # (int) – Maximum of hold-down time (in seconds)
+      - decay_half_life_reachable                           # (int) – Decay half-life while reachable (in seconds)
+      - decay_half_life_unreachable                         # (int) – Decay half-life while unreachable (in seconds)
+  bgp_outbound_route_filter:
+    module: panos.network
+    class: BgpOutboundRouteFilter
+    sort_param: ~
+    params:
+      - enable                                              # (bool) – enable prefix-based outbound route filtering.
+      - max_recieved_entries                                # (int) – maximum of ORF prefixes to receive.
+      - cisco_prefix_mode                                   # (bool) – ORF vendor-compatible mode
+  bgp_peer:
+    module: panos.network
+    class: BgpPeer
+    sort_param: name
+    params:
+      - name                                                # (str) – Name of BGP Peer
+      - enable                                              # (bool) – Enable Peer (Default: True)
+      - peer_as                                             # (str) – peer AS number
+      - enable_mp_bgp                                       # (bool) – enable MP-BGP extentions
+      - address_family_identifier                           # (str) – peer address family type * ipv4 * ipv6
+      - subsequent_address_unicast                          # (bool) – select SAFI for this peer
+      - subsequent_address_multicast                        # (bool) – select SAFI for this peer
+      - local_interface                                     # (str) – interface to accept BGP session
+      - local_interface_ip                                  # (str) – specify exact IP address if interface has multiple addresses
+      - peer_address_ip                                     # (str) – IP address of peer
+      - connection_authentication                           # (str) – BGP auth profile name
+      - connection_keep_alive_interval                      # (int) – keep-alive interval (in seconds)
+      - connection_min_route_adv_interval                   # (int) – Minimum Route Advertisement Interval (in seconds)
+      - connection_multihop                                 # (int) – IP TTL value used for sending BGP packet. set to 0 means eBGP use 2, iBGP use 255
+      - connection_open_delay_time                          # (int) – open delay time (in seconds)
+      - connection_hold_time                                # (int) – hold time (in seconds)
+      - connection_idle_hold_time                           # (int) – idle hold time (in seconds)
+      - connection_incoming_allow                           # (bool) – allow incoming connections
+      - connection_outgoing_allow                           # (bool) – allow outgoing connections
+      - connection_incoming_remote_port                     # (int) – restrict remote port for incoming BGP connections
+      - connection_outgoing_local_port                      # (int) – use specific local port for outgoing BGP connections
+      - enable_sender_side_loop_detection                   # (bool) –
+      - reflector_client                                    # (str) – Options: non-client, client, meshed-client
+      - peering_type                                        # (str) – Options: unspecified, bilateral
+      - aggregated_confed_as_path                           # (#) – this peer understands aggregated confederation AS path
+      - max_prefixes                                        # (int) – maximum of prefixes to receive from peer
+      - max_orf_entries                                     # (#) – maximum of ORF entries accepted from peer
+      - soft_reset_with_stored_info                         # (#) – soft reset with stored info
+      - bfd_profile                                         # (str) – BFD configuration: Inherit-vr-global-setting, None, Pre-existing BFD profile name, None
+  bgp_peer_group:
+    module: panos.network
+    class: BgpPeerGroup
+    sort_param: name
+    params:
+      - name                                                # (str) – Name of BGP Peer Group
+      - enable                                              # (bool) – Enable Peer Group (Default: True)
+      - aggregated_confed_as_path                           # (bool) – the peers understand aggregated confederation AS path
+      - soft_reset_with_stored_info                         # (bool) – soft reset with stored info
+      - type                                                # (str) – peer group type I(‘ebgp’)/I(‘ibgp’)/I(‘ebgp-confed’)/I(‘ibgp-confed’)
+      - export_nexthop                                      # (str) – export locally resolved nexthop I(‘resolve’)/I(‘use-self’)
+      - import_nexthop                                      # (str) – override nexthop with peer address I(‘original’)/I(‘use-peer’), only with ‘ebgp’
+      - remove_private_as                                   # (bool) – remove private AS when exporting route, only with ‘ebgp’
+  bgp_policy_address_prefix:
+    module: panos.network
+    class: BgpPolicyAddressPrefix
+    sort_param: name
+    params:
+      - name                                                # (str) – address prefix
+      - exact                                               # (str) – match exact prefix length
+  bgp_policy_advertise_filter:
+    module: panos.network
+    class: BgpPolicyAdvertiseFilter
+    sort_param: name
+    params:
+      - name                                                # (str) – Name of filter
+      - enable                                              # (bool) – Enable rule.
+      - match_afi                                           # (str) – Address Family Identifier * ip * ipv6
+      - match_safi                                          # (str) – Subsequent Address Family Identifier * ip * ipv6
+      - match_route_table                                   # (str) – Route table to match rule * unicast * multicast * both
+      - match_nexthop                                       # (list) – Next-hop attributes
+      - match_from_peer                                     # (list) – Filter by peer that sent this route
+      - match_med                                           # (int) – Multi-Exit Discriminator
+      - match_as_path_regex                                 # (str) – AS-path regular expression
+      - match_community_regex                               # (str) – Community AS-path regular expression
+      - match_extended_community_regex                      # (str) – Extended Community AS-path regular expression
+  bgp_policy_aggregation_address:
+    module: panos.network
+    class: BgpPolicyAggregationAddress
+    sort_param: name
+    params:
+      - name                                                # (str) – Sddress prefix
+      - enable                                              # (bool) – Enable aggregation for this prefix
+      - prefix                                              # (str) – Aggregating address prefix
+      - summary                                             # (bool) – Summarize route
+      - as_set                                              # (bool) – Generate AS-set attribute
+      - attr_local_preference                               # (int) – New local preference value
+      - attr_med                                            # (int) – New MED value
+      - attr_weight                                         # (int) – New weight value
+      - attr_nexthop                                        # (str) – Nexthop address
+      - attr_origin                                         # (str) – New route origin * igp * egp * incomplete
+      - attr_as_path_limit                                  # (int) – Add AS path limit attribute if it does not exist
+      - attr_as_path_type                                   # (str) – AS path update options * none (string, not to be confused with the Python type None) * remove * prepend * remove-and-prepend
+      - attr_as_path_prepend_times                          # (int) – Prepend local AS for specified number of times * only valid when attr_as_path_type is ‘prepend’ or ‘remove-and-prepend’
+      - attr_community_type                                 # (str) – Community update options * none (string, not to be confused with the Python type None) * remove-all * remove-regex * append * overwrite
+      - attr_community_argument                             # (str) – Argument to the attr community value if needed * None * local-as * no-advertise * no-export * nopeer * regex * 32-bit value * AS:VAL
+      - attr_extended_community_type                        # (str) – Extended community update options * none (string, not to be confused with the Python type None) * remove-all * remove-regex * append * overwrite
+      - attr_extended_community_argument                    # (str) – Argument to the attr extended community value if needed
+  bgp_policy_conditional_advertisement:
+    module: panos.network
+    class: BgpPolicyConditionalAdvertisement
+    sort_param: name
+    params:
+      - name                                                # (str) – Name of Conditional Advertisement Policy
+      - enable                                              # (bool) – enable prefix-based outbound route filtering.
+      - used_by                                             # (list) – peer-groups that use this rule.
+  bgp_policy_export_rule:
+    module: panos.network
+    class: BgpPolicyExportRule
+    sort_param: name
+    params:
+      - name                                                # (str) – Name of filter
+      - enable                                              # (bool) – Enable rule.
+      - match_afi                                           # (str) – Address Family Identifier * ip * ipv6
+      - match_safi                                          # (str) – Subsequent Address Family Identifier * ip * ipv6
+      - match_route_table                                   # (str) – Route table to match rule * unicast * multicast * both
+      - match_nexthop                                       # (list) – Next-hop attributes
+      - match_from_peer                                     # (list) – Filter by peer that sent this route
+      - match_med                                           # (int) – Multi-Exit Discriminator
+      - match_as_path_regex                                 # (str) – AS-path regular expression
+      - match_community_regex                               # (str) – Community AS-path regular expression
+      - match_extended_community_regex                      # (str) – Extended Community AS-path regular expression
+  bgp_policy_import_rule:
+    module: panos.network
+    class: BgpPolicyImportRule
+    sort_param: name
+    params:
+      - name                                                # (str) – Name of filter
+      - enable                                              # (bool) – Enable rule.
+      - match_afi                                           # (str) – Address Family Identifier * ip * ipv6
+      - match_safi                                          # (str) – Subsequent Address Family Identifier * ip * ipv6
+      - match_route_table                                   # (str) – Route table to match rule * unicast * multicast * both
+      - match_nexthop                                       # (list) – Next-hop attributes
+      - match_from_peer                                     # (list) – Filter by peer that sent this route
+      - match_med                                           # (int) – Multi-Exit Discriminator
+      - match_as_path_regex                                 # (str) – AS-path regular expression
+      - match_community_regex                               # (str) – Community AS-path regular expression
+      - match_extended_community_regex                      # (str) – Extended Community AS-path regular expression
+  bgp_policy_non_exist_filter:
+    module: panos.network
+    class: BgpPolicyNonExistFilter
+    sort_param: name
+    params:
+      - name                                                # (str) – Name of filter
+      - enable                                              # (bool) – Enable rule.
+      - match_afi                                           # (str) – Address Family Identifier * ip * ipv6
+      - match_safi                                          # (str) – Subsequent Address Family Identifier * ip * ipv6
+      - match_route_table                                   # (str) – Route table to match rule * unicast * multicast * both
+      - match_nexthop                                       # (list) – Next-hop attributes
+      - match_from_peer                                     # (list) – Filter by peer that sent this route
+      - match_med                                           # (int) – Multi-Exit Discriminator
+      - match_as_path_regex                                 # (str) – AS-path regular expression
+      - match_community_regex                               # (str) – Community AS-path regular expression
+      - match_extended_community_regex                      # (str) – Extended Community AS-path regular expression
+  bgp_policy_suppress_filter:
+    module: panos.network
+    class: BgpPolicySuppressFilter
+    sort_param: name
+    params:
+      - name                                                # (str) – Name of filter
+      - enable                                              # (bool) – Enable rule.
+      - match_afi                                           # (str) – Address Family Identifier * ip * ipv6
+      - match_safi                                          # (str) – Subsequent Address Family Identifier * ip * ipv6
+      - match_route_table                                   # (str) – Route table to match rule * unicast * multicast * both
+      - match_nexthop                                       # (list) – Next-hop attributes
+      - match_from_peer                                     # (list) – Filter by peer that sent this route
+      - match_med                                           # (int) – Multi-Exit Discriminator
+      - match_as_path_regex                                 # (str) – AS-path regular expression
+      - match_community_regex                               # (str) – Community AS-path regular expression
+      - match_extended_community_regex                      # (str) – Extended Community AS-path regular expression
+  bgp_redistribution_rule:
+    module: panos.network
+    class: BgpRedistributionRule
+    sort_param: name
+    params:
+      - name                                                # (str) – Redistribution profile name
+      - enable                                              # (bool) – Enable redistribution rule.
+      - address_family_identifier                           # (str) – Select redistribution profile type * ipv4 * ipv6
+      - route_table                                         # (str) – Select destination SAFI for redistribution * unicast * multicast * both
+      - set_origin                                          # (str) – Add the ORIGIN path attribute * igp * egp * incomplete
+      - set_med                                             # (int) – Add the MULTI_EXIT_DISC path attribute
+      - set_local_preference                                # (int) – Add the LOCAL_PREF path attribute
+      - set_as_path_limit                                   # (int) – Add the AS_PATHLIMIT path attribute
+      - set_community                                       # (list) – Add the COMMUNITY path attribute
+      - set_extended_community                              # (list) – Add the EXTENDED COMMUNITY path attribute
+      - metric                                              # (int) – Metric value
+  bgp_routing_options:
+    module: panos.network
+    class: BgpRoutingOptions
+    sort_param: ~
+    params:
+      - as_format                                           # (str) – AS format (‘2-byte’/’4-byte’)
+      - always_compare_med                                  # (bool) – always compare MEDs
+      - deterministic_med_comparison                        # (bool) – deterministic MEDs comparison
+      - default_local_preference                            # (int) – default local preference
+      - graceful_restart_enable                             # (bool) – enable graceful restart
+      - gr_stale_route_time                                 # (int) – time to remove stale routes after peer restart (in seconds)
+      - gr_local_restart_time                               # (int) – local restart time to advertise to peer (in seconds)
+      - gr_max_peer_restart_time                            # (int) – maximum of peer restart time accepted (in seconds)
+      - reflector_cluster_id                                # (str) – route reflector cluster ID
+      - confederation_member_as                             # (str) – 32-bit value in decimal or dot decimal AS.AS format
+      - aggregate_med                                       # (bool) – aggregate route only if they have same MED attributes
   email_server:
     module: panos.device
     class: EmailServer
-    parent: fw
-    skip: true
     sort_param: name
     params:
-      - name                                              # (str) – The name
-      - display_name                                      # (str) – Display name
-      - from                                              # (str) – From email address
-      - to                                                # (str) – To email address
-      - also_to                                           # (str) – Additional destination email address
-      - email_gateway                                     # (str) – IP address or FQDN of email gateway to use
-  email_server_profile:
+      - name                                                # (str) – The name
+      - display_name                                        # (str) – Display name
+      - from                                                # (str) – From email address
+      - to                                                  # (str) – To email address
+      - also_to                                             # (str) – Additional destination email address
+      - email_gateway                                       # (str) – IP address or FQDN of email gateway to use
+  http_server:
     module: panos.device
-    class: EmailServerProfile
-    parent: fw
-    skip: true
+    class: HttpServer
     sort_param: name
     params:
-      - name                                              # (str) – The name
-      - display_name                                      # (str) – Display name
-      - from                                              # (str) – From email address
-      - to                                                # (str) – To email address
-      - also_to                                           # (str) – Additional destination email address
-      - email_gateway                                     # (str) – IP address or FQDN of email gateway to use
-
-  # TODO: Add support for HttpServerProfile + all childs
-  # TODO: Add support for SnmpServerProfile + SnmpV2cServer + SnmpV3Server
-  # TODO: Add support for SyslogServerProfile + SyslogServer
-
-  system_settings:
+      - name                                                # (str) – The name
+      - address                                             # (str) – IP address or FQDN of HTTP server to use
+      - protocol                                            # (str) – HTTPS (default) or HTTP
+      - port                                                # (int) – Port number (default: 443).
+      - tls_version                                         # (str) – (PAN-OS 9.0+) TLS handshake protocol version. Valid values are 1.0, 1.1, or 1.2.
+      - certificate_profile                                 # (str) – (PAN-OS 9.0+) Certificate profile for validating server certificate
+      - http_method                                         # (str) – HTTP method to use (default: POST).
+      - username                                            # (str) – Username for basic HTTP auth
+      - password                                            # (str) – Password for basic HTTP auth
+  http_auth_header:
     module: panos.device
-    class: SystemSettings
-    parent: fw
-    skip: false
-    sort_param: hostname
+    class: HttpAuthHeader
+    sort_param: name
     params:
-      - hostname                                          # (str) – The hostname of the device
-      - domain                                            # (str) – The domain of the device
-      - ip_address                                        # (str) – Management interface IP address
-      - netmask                                           # (str) – Management interface netmask
-      - default_gateway                                   # (str) – Management interface default gateway
-      - ipv6_address                                      # (str) – Management interface IPv6 address
-      - ipv6_default_gateway                              # (str) – Management interface IPv6 default gateway
-      - dns_primary                                       # (str) – Primary DNS server IP address
-      - dns_secondary                                     # (str) – Secondary DNS server IP address
-      - timezone                                          # (str) – Device timezone
-      # TODO: add support for panorama stuff at some point…
-      # 'panorama' param returns the following:
-      #     "panorama": "<bound method PanObject.panorama of <SystemSettings 0x1066e7700>>",
-      #- panorama                                          # (str) – IP address of primary Panorama
-      #- panorama2                                         # (str) – IP address of secondary Panorama
-      - login_banner                                      # (str) – Login banner text
-      - update_server                                     # (str) – IP or hostname of the update server
-      - verify_update_server                              # (bool) – Verify the update server identity
-      - dhcp_send_hostname                                # (bool) – (DHCP Mngt) Send Hostname
-      - dhcp_send_client_id                               # (bool) – (DHCP Mngt) Send Client ID
-      - accept_dhcp_hostname                              # (bool) – (DHCP Mngt) Accept DHCP hostname
-      - accept_dhcp_domain                                # (bool) – (DHCP Mngt) Accept DHCP domain name
-    children:
-      ntp_primary:
-        module: panos.device
-        class: NTPServerPrimary
-        params:
-          - address                                       # (str) – IP address or hostname of NTP server
-      ntp_secondary:
-        module: panos.device
-        class: NTPServerSecondary
-        params:
-          - address                                       # (str) – IP address or hostname of NTP server
-  telemetry:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_auth_param:
     module: panos.device
-    class: Telemetry
-    parent: fw
-    skip: false
-    sort_param: ~
+    class: HttpAuthParam
+    sort_param: name
     params:
-      - app_reports                                       # (bool) – Application reports
-      - threat_reports                                    # (bool) – Threat preventioin reports
-      - url_reports                                       # (bool) – URL reports
-      - file_type_reports                                 # (bool) – File type identification reports
-      - threat_data                                       # (bool) – Threat prevention data
-      - threat_pcaps                                      # (bool) – Enable sending packet captures with threat prevention information. This requires that “threat_data” also be enabled.
-      - product_usage_stats                               # (bool) – Health and performance reports
-      - passive_dns_monitoring                            # (bool) – Passive DNS monitoring
-  vsys:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_config_header:
     module: panos.device
-    class: Vsys
-    parent: fw
-    skip: false
+    class: HttpConfigHeader
     sort_param: name
     params:
-      - name                                              # (str) – Vsys identifier (eg. ‘vsys1’, ‘vsys5’, etc)
-      - display_name                                      # (str) – Friendly name of the vsys
-      - interface                                         # (list) – A list of strings with names of interfaces or a list of panos.network.Interface objects
-      - vlans                                             # (list) – A list of strings of VLANs
-      - virtual_wires                                     # (list) – A list of strings of virtual wires
-      - virtual_routers                                   # (list) – A list of strings of virtual routers
-      - visible_vsys                                      # (list) – A list of strings of the vsys visible
-      - dns_proxy                                         # (str) – DNS Proxy server
-      - decrypt_forwarding                                # (bool) – Allow forwarding of decrypted content
-  vsys_resources:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_config_param:
     module: panos.device
-    class: VsysResources
-    parent: fw
-    skip: true
-    sort_param: ~
-    params:
-      - max_security_rules                                # (int) – Maximum security rules
-      - max_nat_rules                                     # (int) – Maximum nat rules
-      - max_ssl_decryption_rules                          # (int) – Maximum ssl decryption rules
-      - max_qos_rules                                     # (int) – Maximum QOS rules
-      - max_application_override_rules                    # (int) – Maximum application override rules
-      - max_pbf_rules                                     # (int) – Maximum policy based forwarding rules
-      - max_cp_rules                                      # (int) – Maximum captive portal rules
-      - max_dos_rules                                     # (int) – Maximum DOS rules
-      - max_site_to_site_vpn_tunnels                      # (int) – Maximum site-to-site VPN tunnels
-      - max_concurrent_ssl_vpn_tunnels                    # (int) – Maximum ssl VPN tunnels
-      - max_sessions                                      # (int) – Maximum sessions
-
-###############################################################################
-################################### OBJECTS ###################################
-###############################################################################
-objects:
-  address_group:
-    module: panos.objects
-    class: AddressGroup
-    parent: fw
-    skip: false
-    sort_param: name
-    params: 
-      - name                                              # (str) - Name of the address group
-      - static_value                                      # (list) - Values for a static address group
-      - dynamic_value                                     # (str) - Registered-ip tags for a dynamic address group
-      - description                                       # (str) - Description of this object
-      - tag                                               # (list) - Administrative tags (not to be confused with registered-ip tags)
-  address_object:
-    module: panos.objects
-    class: AddressObject
-    parent: fw
-    skip: false
+    class: HttpConfigParam
     sort_param: name
     params:
-      - name                                              # (str) - Name of the object
-      - value                                             # (str) - IP address or other value of the object
-      - type                                              # (str) - Type of address: * ip-netmask (default) * ip-range * ip-wildcard (added in PAN-OS 9.0) * fqdn
-      - description                                       # (str) - Description of this object
-      - tag                                               # (list) - Administrative tags
-  application_container:
-    module: panos.objects
-    class: ApplicationContainer
-    parent: fw
-    skip: true
-    sort_param: null
-    params:
-      - applications                                      # (list) - List of memeber applications
-  application_filter:
-    module: panos.objects
-    class: ApplicationFilter
-    parent: fw
-    skip: true
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_data_header:
+    module: panos.device
+    class: HttpDataHeader
     sort_param: name
     params:
-      - name                                              # (str) - Name of the object
-      - category                                          # (list) – Application category
-      - subcategory                                       # (list) – Application subcategory
-      - technology                                        # (list) – Application technology
-      - risk                                              # (list) – Application risk
-      - evasive                                           # (bool) –
-      - excessive_bandwidth_use                           # (bool) –
-      - prone_to_misuse                                   # (bool) –
-      - is_saas                                           # (bool) –
-      - transfers_files                                   # (bool) –
-      - tunnels_other_apps                                # (bool) –
-      - used_by_malware                                   # (bool) –
-      - has_known_vulnerabilities                         # (bool) –
-      - pervasive                                         # (bool) –
-      - tag                                               # (list) – Administrative tags
-  application_group:
-    module: panos.objects
-    class: ApplicationGroup
-    parent: fw
-    skip: false
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_data_param:
+    module: panos.device
+    class: HttpDataParam
     sort_param: name
     params:
-      - name                                              # (str) – Name of the object
-      - value                                             # (list) – List of application values
-      - tag                                               # (list) – Administrative tags
-  application_object:
-    module: panos.objects
-    class: ApplicationObject
-    parent: fw
-    skip: true
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_gtp_header:
+    module: panos.device
+    class: HttpGtpHeader
     sort_param: name
     params:
-      - name                                              # (str) – Name of the object
-      - category                                          # (str) – Application category
-      - subcategory                                       # (str) – Application subcategory
-      - technology                                        # (str) – Application technology
-      - risk                                              # (int) – Risk (1-5) of the application
-      - default_type                                      # (str) – Default identification type of the application
-      - default_value                                     # (list) – Values for the default type
-      - parent_app                                        # (str) – Parent Application for which this app falls under
-      - timeout                                           # (int) – Default timeout
-      - tcp_timeout                                       # (int) – TCP timeout
-      - udp_timeout                                       # (int) – UDP timeout
-      - tcp_half_closed_timeout                           # (int) – TCP half closed timeout
-      - tcp_time_wait_timeout                             # (int) – TCP wait time timeout
-      - evasive_behavior                                  # (bool) – Applicaiton is actively evasive
-      - consume_big_bandwidth                             # (bool) – Application uses large bandwidth
-      - used_by_malware                                   # (bool) – Application is used by malware
-      - able_to_transfer_file                             # (bool) – Application can do file transfers
-      - has_known_vulnerability                           # (bool) – Application has known vulnerabilities
-      - tunnel_other_application                          # (bool) –
-      - tunnel_applications                               # (list) – List of tunneled applications
-      - prone_to_misuse                                   # (bool) –
-      - pervasive_use                                     # (bool) –
-      - file_type_ident                                   # (bool) –
-      - virus_ident                                       # (bool) –
-      - data_ident                                        # (bool) –
-      - description                                       # (str) – Description of this object
-      - tag                                               # (list) – Administrative tags
-  custom_url_category:
-    module: panos.objects
-    class: CustomUrlCategory
-    parent: fw
-    skip: true
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_gtp_param:
+    module: panos.device
+    class: HttpGtpParam
     sort_param: name
     params:
-      - name                                              # (str) – The name
-      - url_value                                         # (list) – Values to include in custom URL category object
-      - description                                       # (str) – Description of this object
-  dynamic_user_group:
-    module: panos.objects
-    class: DynamicUserGroup
-    parent: fw
-    skip: true
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_hip_match_header:
+    module: panos.device
+    class: HttpHipMatchHeader
     sort_param: name
     params:
-      - name                                              # (str) – Name of the dynamic user group
-      - description                                       # (str) – Description of this object
-      - filter                                            # (str) – Tag-based filter.
-      - tag                                               # (list) – Administrative tags
-  log_forwarding_profile:
-    module: panos.objects
-    class: LogForwardingProfile
-    parent: fw
-    skip: true
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_hip_match_param:
+    module: panos.device
+    class: HttpHipMatchParam
     sort_param: name
     params:
-      - name                                              # (str) – The name
-      - description                                       # (str) – The description
-      - enhanced_logging                                  # (bool) – (PAN-OS 8.1+) Enabling enhanced application logging
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_ip_tag_header:
+    module: panos.device
+    class: HttpIpTagHeader
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_ip_tag_param:
+    module: panos.device
+    class: HttpIpTagParam
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_sctp_header:
+    module: panos.device
+    class: HttpSctpHeader
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_sctp_param:
+    module: panos.device
+    class: HttpSctpParam
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_system_header:
+    module: panos.device
+    class: HttpSystemHeader
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_system_param:
+    module: panos.device
+    class: HttpSystemParam
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_threat_header:
+    module: panos.device
+    class: HttpThreatHeader
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_threat_param:
+    module: panos.device
+    class: HttpThreatParam
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_traffic_header:
+    module: panos.device
+    class: HttpTrafficHeader
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_traffic_param:
+    module: panos.device
+    class: HttpTrafficParam
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_tunnel_header:
+    module: panos.device
+    class: HttpTunnelHeader
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_tunnel_param:
+    module: panos.device
+    class: HttpTunnelParam
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_url_header:
+    module: panos.device
+    class: HttpUrlHeader
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_url_param:
+    module: panos.device
+    class: HttpUrlParam
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_user_id_header:
+    module: panos.device
+    class: HttpUserIdHeader
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_user_id_param:
+    module: panos.device
+    class: HttpUserIdParam
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_wildfire_header:
+    module: panos.device
+    class: HttpWildfireHeader
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  http_wildfire_param:
+    module: panos.device
+    class: HttpWildfireParam
+    sort_param: name
+    params:
+      - name                                                # (str) – The header name
+      - value                                               # (str) – The header value
+  ipsec_tunnel_ipv4_proxy_id:
+    module: panos.network
+    class: IpsecTunnelIpv4ProxyId
+    sort_param: name
+    params:
+      - name                                                # (str) – The proxy ID
+      - local                                               # (str) – IP subnet or IP address represents local network
+      - remote                                              # (str) – IP subnet or IP address represents remote network
+      - any_protocol                                        # (bool) – Any protocol
+      - number_proto                                        # (int) – Numbered Protocol: protocol number (1-254)
+      - tcp_local_port                                      # (int) – Protocol TCP: local port
+      - tcp_remote_port                                     # (int) – Protocol TCP: remote port
+      - udp_local_port                                      # (int) – Protocol UDP: local port
+      - udp_remote_port                                     # (int) – Protocol UDP: remote port
+  ipsec_tunnel_ipv6_proxy_id:
+    module: panos.network
+    class: IpsecTunnelIpv6ProxyId
+    sort_param: name
+    params:
+      - name                                                # (str) – The proxy ID
+      - local                                               # (str) – IP subnet or IP address represents local network
+      - remote                                              # (str) – IP subnet or IP address represents remote network
+      - any_protocol                                        # (bool) – Any protocol
+      - number_proto                                        # (int) – Numbered Protocol: protocol number (1-254)
+      - tcp_local_port                                      # (int) – Protocol TCP: local port
+      - tcp_remote_port                                     # (int) – Protocol TCP: remote port
+      - udp_local_port                                      # (int) – Protocol UDP: local port
+      - udp_remote_port                                     # (int) – Protocol UDP: remote port
+  ipv6_address:
+    module: panos.network
+    class: IPv6Address
+    sort_param: address
+    params:
+      - address                                             # (str) - The IPv6 address
+      - enabled-on-interface                                # (bool) – Enabled IPv6 on the interface this object was added to
+      - prefix                                              # (bool) – Use interface ID as host portion
+      - anycast                                             # (bool) – Enable anycast
+      - advertise_enabled                                   # (bool) – Enabled router advertisements
+      - valid_lifetime                                      # (int) – Valid lifetime
+      - onlink_flag                                         # (bool) –
+      - auto_config_flag                                    # (bool) –
+  layer2_subinterface:
+    module: panos.network
+    class: Layer2Subinterface
+    sort_param: name
+    params:
+      - name                                                # (str) - name for the interface
+      - tag                                                 # (int) – Tag for the interface, aka vlan id
+      - lldp_enabled                                        # (bool) – Enable LLDP
+      - lldp_profile                                        # (str) – Reference to an lldp profile
+      - netflow_profile_l2                                  # (str) – Netflow profile
+      - comment                                             # (str) – The interface’s comment
+  layer3_subinterface:
+    module: panos.network
+    class: Layer3Subinterface
+    sort_param: name
+    params:
+      - name                                                # (str) - name for the interface
+      - tag                                                 # (int) – Tag for the interface, aka vlan id
+      - ip                                                  # (tuple) – Interface IPv4 addresses
+      - ipv6_enabled                                        # (bool) – IPv6 Enabled (requires IPv6Address child object)
+      - management_profile                                  # (str/ManagementProfile) – Interface Management Profile
+      - mtu                                                 # (int) – MTU for interface
+      - adjust_tcp_mss                                      # (bool) – Adjust TCP MSS
+      - netflow_profile                                     # (str) – Netflow profile
+      - comment                                             # (str) – The interface’s comment
+      - ipv4_mss_adjust                                     # (int) – TCP MSS adjustment for ipv4
+      - ipv6_mss_adjust                                     # (int) – TCP MSS adjustment for ipv6
+      - enable_dhcp                                         # (bool) – Enable DHCP on this interface
+      - create_dhcp_default_route                           # (bool) – Create default route pointing to default gateway provided by server
+      - dhcp_default_route_metric                           # (int) – Metric for the DHCP default route
+      - decrypt_forward                                     # (bool) – (PAN-OS 8.1+) Decrypt forward.
   log_forwarding_profile_match_list:
     module: panos.objects
     class: LogForwardingProfileMatchList
-    parent: fw
-    skip: true
     sort_param: name
     params:
-      - name                                              # (str) – The name
-      - description                                       # (str) – Description
-      - log_type                                          # (str) – Log type. Valid values are traffic, threat, wildfire, url, data, gtp, tunnel, auth, or sctp (PAN-OS 8.1+).
-      - filter                                            # (str) – The filter.
-      - send_to_panorama                                  # (bool) – Send to panorama or not
-      - snmp_profiles                                     # (str/list) – List of SnmpServerProfiles.
-      - email_profiles                                    # (str/list) – List of EmailServerProfiles.
-      - syslog_profiles                                   # (str/list) – List of SyslogServerProfiles.
-      - http_profiles                                     # (str/list) – List of HttpServerProfiles.
+      - name                                                # (str) – The name
+      - description                                         # (str) – Description
+      - log_type                                            # (str) – Log type. Valid values are traffic, threat, wildfire, url, data, gtp, tunnel, auth, or sctp (PAN-OS 8.1+).
+      - filter                                              # (str) – The filter.
+      - send_to_panorama                                    # (bool) – Send to panorama or not
+      - snmp_profiles                                       # (str/list) – List of SnmpServerProfiles.
+      - email_profiles                                      # (str/list) – List of EmailServerProfiles.
+      - syslog_profiles                                     # (str/list) – List of SyslogServerProfiles.
+      - http_profiles                                       # (str/list) – List of HttpServerProfiles.
   log_forwarding_profile_match_list_action:
     module: panos.objects
     class: LogForwardingProfileMatchListAction
-    parent: fw
-    skip: true
     sort_param: name
     params:
-      - name                                              # (str) – The name
-      - action_type                                       # (str) – Action type. Valid values are tagging (default) or (PAN-OS 8.1+) integration.
-      - action                                            # (str) – The action. Valid values are add-tag, remove-tag, or (PAN-OS 8.1+) Azure-Security-Center-Integration.
-      - target                                            # (str) – The target. Valid values are source-address or destination-address.
-      - registration                                      # (str) – Registration. Valid values are localhost, panorama, or remote.
-      - http_profile                                      # (str) – The HTTP profile for registration of “remote”.
-      - tags                                              # (str/list) – List of administrative tags.
-      - timeout                                           # (int) – (PAN-OS 9.0+) Timeout in minutes
-  region:
-    module: panos.objects
-    class: Region
-    parent: fw
-    skip: true
+      - name                                                # (str) – The name
+      - action_type                                         # (str) – Action type. Valid values are tagging (default) or (PAN-OS 8.1+) integration.
+      - action                                              # (str) – The action. Valid values are add-tag, remove-tag, or (PAN-OS 8.1+) Azure-Security-Center-Integration.
+      - target                                              # (str) – The target. Valid values are source-address or destination-address.
+      - registration                                        # (str) – Registration. Valid values are localhost, panorama, or remote.
+      - http_profile                                        # (str) – The HTTP profile for registration of “remote”.
+      - tags                                                # (str/list) – List of administrative tags.
+      - timeout                                             # (int) – (PAN-OS 9.0+) Timeout in minutes
+  ntp_primary:
+    module: panos.device
+    class: NTPServerPrimary
+    params:
+      - address                                             # (str) – IP address or hostname of NTP server
+  ntp_secondary:
+    module: panos.device
+    class: NTPServerSecondary
+    params:
+      - address                                             # (str) – IP address or hostname of NTP server
+  ospf:
+    module: panos.network
+    class: Ospf
+    sort_param: ~
+    params:
+      - enable                                              # (bool) – Enable OSPF (Default: True)
+      - router_id                                           # (str) – Router ID in IP format (eg. 1.1.1.1)
+      - reject_default_route                                # (bool) – Reject default route
+      - allow_redist_default_route                          # (bool) – Allow redistribution in default route
+      - rfc1583                                             # (bool) – rfc1583
+      - spf_calculation_delay                               # (int) – SPF calculation delay
+      - lsa_interval                                        # (int) – LSA interval
+      - graceful_restart_enable                             # (bool) – Enable OSPF graceful restart
+      - gr_grace_period                                     # (int) – Graceful restart period
+      - gr_helper_enable                                    # (bool) – Graceful restart helper enable
+      - gr_strict_lsa_checking                              # (bool) – Graceful restart strict lsa checking
+      - gr_max_neighbor_restart_time                        # (int) – Graceful restart neighbor restart time
+  ospf_area:
+    module: panos.network
+    class: OspfArea
     sort_param: name
     params:
-      - name                                              # (str) – Name of the region
-      - address                                           # (list) – List of IP networks
-      - latitude                                          # (float) – Latitude of the region
-      - longitude                                         # (float) – Longitude of the region
-  schedule_object:
-    module: panos.objects
-    class: ScheduleObject
-    parent: fw
-    skip: true
+      - name                                                # (str) – Area in IP format
+      - type                                                # (str) – Type of area, ‘normal’, ‘stub’, or ‘nssa’ (Default: normal)
+      - accept_summary                                      # (bool) – Accept summary route - stub and nssa only
+      - default_route_advertise                             # (str) – ‘disable’ or ‘advertise’ (Default: disable) - stub and nssa only
+      - default_route_advertise_metric                      # (int) – Default route metric - stub and nssa only
+      - default_route_advertise_type                        # (str) – ‘ext-1’ or ‘ext2’ (Default: ext-2 - nssa only
+  ospf_area_interface:
+    module: panos.network
+    class: OspfAreaInterface
     sort_param: name
     params:
-      - name                                              # (str) – Name of the object
-      - disable_override                                  # (bool) – “True” to set disable-override
-      - type                                              # (str) – Type of Schedule: “recurring” or “non-recurring”
-      - non_recurring_date_time                           # (list/str) – “Date and Time Range” string for a non-recurring schedule
-      - recurrence                                        # (str) – “daily” or “weekly” recurrence
-      - daily_time                                        # (list/str) – “Time Range” for a daily recurring schedule
-      - weekly_sunday_time                                # (list/str) – “Time Range” for a weekly recurring schedule (Sunday)
-      - weekly_monday_time                                # (list/str) – “Time Range” for a weekly recurring schedule (Monday)
-      - weekly_tuesday_time                               # (list/str) – “Time Range” for a weekly recurring schedule (Tuesday)
-      - weekly_wednesday_time                             # (list/str) – “Time Range” for a weekly recurring schedule (Wednesday)
-      - weekly_thursday_time                              # (list/str) – “Time Range” for a weekly recurring schedule (Thursday)
-      - weekly_friday_time                                # (list/str) – “Time Range” for a weekly recurring schedule (Friday)
-      - weekly_saturday_time                              # (list/str) – “Time Range” for a weekly recurring schedule (Saturday)
-  security_profile_group:
-    module: panos.objects
-    class: SecurityProfileGroup
-    parent: fw
-    skip: false
+      - name                                                # (str) – Name of the interface (interface must exist)
+      - enable                                              # (bool) – OSPF enabled on this interface
+      - passive                                             # (bool) – Passive mode
+      - link_type                                           # (str) – Link type, ‘broadcast’, ‘p2p’, or ‘p2mp’ (Default: broadcast)
+      - metric                                              # (int) – Metric
+      - priority                                            # (int) – Priority id
+      - hello_interval                                      # (int) – Hello interval
+      - dead_counts                                         # (int) – Dead counts
+      - retransmit_interval                                 # (int) – Retransmit interval
+      - transit_delay                                       # (int) – Transit delay
+      - gr_delay                                            # (int) – Graceful restart delay
+      - authentication                                      # (str) – Reference to a panos.network.OspfAuthProfile
+  ospf_auth_profile:
+    module: panos.network
+    class: OspfAuthProfile
     sort_param: name
     params:
-      - name                                              # (str) – The group name
-      - virus                                             # (str) – Antivirus profile
-      - spyware                                           # (str) – Anti-spyware profile
-      - vulnerability                                     # (str) – Vulnerability protection profile
-      - url_filtering                                     # (str) – URL filtering profile
-      - file_blocking                                     # (str) – File blocking profile
-      - data_filtering                                    # (str) – Data filtering profile
-      - wildfire_analysis                                 # (str) – WildFire analysis profile
-  service_group:
-    module: panos.objects
-    class: ServiceGroup
-    parent: fw
-    skip: false
+      - name                                                # (str) – Name of Auth Profile
+      - type                                                # (str) – ‘password’ or ‘md5’
+      - password                                            # (str) – The password if type is set to ‘password’. If type is set to ‘md5’, add a panos.network.OspfAuthProfileMd5
+  ospf_auth_profile_md5:
+    module: panos.network
+    class: OspfAuthProfileMd5
+    sort_param: ~
+    params:
+      - keyid                                               # (int) – Identifier for key
+      - key                                                 # (str) – The authentication key
+      - preferred                                           # (bool) – This key is preferred
+  ospf_export_rules:
+    module: panos.network
+    class: OspfExportRules
     sort_param: name
     params:
-      - name                                              # (str) – Name of the object
-      - value                                             # (list) – List of service values
-      - tag                                               # (list) – Administrative tags
-  service_object:
-    module: panos.objects
-    class: ServiceObject
-    parent: fw
-    skip: false
+      - name                                                # (str) – IP subnet or panos.network.RedistributionProfile
+      - new_path_type                                       # (str) – New path type, ‘ext-1’ or ‘ext-2’ (Default: ext-2)
+      - new_tag                                             # (str) – New tag (int or IP format)
+      - metric                                              # (int) – Metric
+  ospf_neighbor:
+    module: panos.network
+    class: OspfNeighbor
     sort_param: name
     params:
-      - name                                              # (str) – Name of the object
-      - protocol                                          # (str) – Protocol of the service, either tcp or udp
-      - source_port                                       # (str) – Source port of the protocol, if any
-      - destination_port                                  # (str) – Destination port of the service
-      - description                                       # (str) – Description of this object
-      - tag                                               # (list) – Administrative tags
-  tag:
-    module: panos.objects
-    class: Tag
-    parent: fw
-    skip: false
+      - name                                                # (str) – IP of neighbor
+      - metric                                              # (int) – Metric
+  ospf_nssa_external_range:
+    module: panos.network
+    class: OspfNssaExternalRange
     sort_param: name
     params:
-      - name                                              # (str) – Name of the tag
-      - color                                             # (str) – Color ID (eg. ‘color1’, ‘color4’, etc). You can use color_code() to generate the ID.
-      - comments                                          # (str) – Comments
-    # accepted color strings for color_code() method
-    # "red": 1, "green": 2, "blue": 3, "yellow": 4, "copper": 5, "orange": 6,
-    # "purple": 7, "gray": 8, "light green": 9, "cyan": 10, "light gray": 11,
-    # "blue gray": 12, "lime": 13, "black": 14, "gold": 15, "brown": 16,
-    # "olive": 17, # there is no color18 "maroon": 19, "red-orange": 20,
-    # "yellow-orange": 21, "forest green": 22, "turquoise blue": 23,
-    # "azure blue": 24, "cerulean blue": 25, "midnight blue": 26, 
-    # "medium blue": 27, "cobalt blue": 28, "violet blue": 29, 
-    # "blue violet": 30, "medium violet": 31, "medium rose": 32, 
-    # "lavender": 33, "orchid": 34, "thistle": 35, "peach": 36, "salmon": 37,
-    # "magenta": 38, "red violet": 39, "mahogany": 40, "burnt sienna": 41,
-    # "chestnut": 42,
-
-###############################################################################
-################################## POLICIES  ##################################
-###############################################################################
-policies:
-  nat_rule:
-    module: panos.policies
-    class: NatRule
-    parent: rulebase
-    skip: false
-    sort_param: null # don't sort, order matters
+      - name                                                # (str) – IP network with prefix
+      - mode                                                # (str) – ‘advertise’ or ‘suppress’ (Default: advertise)
+  ospf_range:
+    module: panos.network
+    class: OspfRange
+    sort_param: name
     params:
-      - name                                              # (str) – Name of the rule
-      - description                                       # (str) – The description
-      - nat_type                                          # (str) – Type of NAT
-      - fromzone                                          # (list) – From zones
-      - tozone                                            # (list) – To zones
-      - to_interface                                      # (str) – Egress interface from route lookup
-      - service                                           # (str) – The service
-      - source                                            # (list) – Source addresses
-      - destination                                       # (list) – Destination addresses
-      - source_translation_type                           # (str) – Type of source address translation
-      - source_translation_address_type                   # (str) – Address type for Dynamic IP And Port or Dynamic IP source translation types
-      - source_translation_interface                      # (str) – Interface of the source address translation for Dynamic IP and Port source translation types
-      - source_translation_ip_address                     # (str) – IP address of the source address translation for Dynamic IP and Port source translation types
-      - source_translation_translated_addresses           # (list) – Translated addresses of the source address translation for Dynamic IP And Port or Dynamic IP source translation types
-      - source_translation_fallback_type                  # (str) – Type of fallback for Dynamic IP source translation types
-      - source_translation_fallback_translated_addresses  # (list) – Addresses for translated address types of fallback source translation
-      - source_translation_fallback_interface             # (str) – The interface for the fallback source translation
-      - source_translation_fallback_ip_type               # (str) – The type of the IP address for the fallback source translation IP address
-      - source_translation_fallback_ip_address            # (str) – The IP address of the fallback source translation
-      - source_translation_static_translated_address      # (str) – The IP address for the static source translation
-      - source_translation_static_bi_directional          #(bool) – Allow reverse translation from translated address to original address
-      - destination_translated_address                    # (str) – Translated destination IP address
-      - destination_translated_port                       # (int) – Translated destination port number
-      - ha_binding                                        # (str) – Device binding configuration in HA Active-Active mode
-      - disabled                                          # (bool) – Disable this rule
-      - negate_target                                     # (bool) – Target all but the listed target firewalls (applies to panorama/device groups only)
-      - target                                            # (list) – Apply this policy to the listed firewalls only (applies to panorama/device groups only)
-      - tag                                               # (list) – Administrative tags
-      - uuid                                              # (str) – (PAN-OS 9.0+) The UUID for this rule.
-  policy_based_forwarding:
-    module: panos.policies
-    class: PolicyBasedForwarding
-    parent: rulebase
-    skip: false
-    sort_param: null # don't sort, order matters
+      - name                                                # (str) – IP network with prefix
+      - mode                                                # (str) – ‘advertise’ or ‘suppress’ (Default: advertise)
+  path_monitor_destination:
+    module: panos.network
+    class: PathMonitorDestination
+    sort_param: name
     params:
-      - name                                              # (str) – The name
-      - description                                       # (str) – The descripton
-      - tags                                              # (str/list) – List of tags
-      - from_type                                         # (str) – Source from type. Valid values are ‘zone’ (default) or ‘interface’.
-      - from_values                                       # (str/list) – The source values for the given type.
-      - source_addresses                                  # (str/list) – List of source IP addresses.
-      - source_users                                      # (str/list) – List of source users.
-      - negate_source                                     # (bool) – Set to negate the source.
-      - destination_addresses                             # (str/list) – List of destination addresses.
-      - negate_destination                                # (bool) – Set to negate the destination.
-      - applications                                      # (str/list) – List of applications.
-      - services                                          # (str/list) – List of services.
-      - schedule                                          # (str) – The schedule.
-      - disabled                                          # (bool) – Set to disable this rule.
-      - action                                            # (str) – The action to take. Valid values are ‘forward’ (default), ‘forward-to-vsys’, ‘discard’, or ‘no-pbf’.
-      - forward_vsys                                      # (str) – The vsys to forward to if action is set to forward to a vsys.
-      - forward_egress_interface                          # (str) – The egress interface.
-      - forward_next_hop_type                             # (str) – The next hop type. Valid values are ‘ip-address’, ‘fqdn’, or None (default).
-      - forward_next_hop_value                            # (str) – The next hop value if the forward next hop type is not None.
-      - forward_monitor_profile                           # (str) – The monitor profile to use.
-      - forward_monitor_ip_address                        # (str) – The monitor IP address.
-      - forward_monitor_disable_if_unreachable            # (bool) – Set to disable this rule if nexthop / monitor IP is unreachable.
-      - enable_enforce_symmetric_return                   # (bool) – Set to enforce symmetric return.
-      - symmetric_return_addresses                        # (str/list) – List of symmetric return addresses.
-      - target                                            # (list) – Apply this policy to the listed firewalls only (applies to panorama/device groups only)
-      - negate_target                                     # (bool) – Target all but the listed target firewalls (applies to panorama/device groups only)
-      - uuid                                              # (str) – (PAN-OS 9.0+) The UUID for this rule.
-  security_rule:
-    module: panos.policies
-    class: SecurityRule
-    parent: rulebase
-    skip: false
-    sort_param: null # don't sort, order matters
+      - name                                                # (str) – Name of Path Monitor Destination
+      - enable                                              # (bool) – Enable Path Monitor Destination
+      - source                                              # (str) – Source ip of interface
+      - destination                                         # (str) – Destination ip
+      - interval                                            # (int) – Ping Interval (sec) (Default: 3)
+      - count                                               # (int) – Ping count (Default: 5)
+  redistribution_profile_v4:
+    module: panos.network
+    class: RedistributionProfile
+    sort_param: name
     params:
-      - name                                              # (str) – Name of the rule
-      - fromzone                                          # (list) – From zones
-      - tozone                                            # (list) – To zones
-      - source                                            # (list) – Source addresses
-      - source_user                                       # (list) – Source users and groups
-      - hip_profiles                                      # (list) – GlobalProtect host integrity profiles
-      - destination                                       # (list) – Destination addresses
-      - application                                       # (list) – Applications
-      - service                                           # (list) – Destination services (ports) (Default: application-default)
-      - category                                          # (list) – Destination URL Categories
-      - action                                            # (str) – Action to take (deny, allow, drop, reset-client, reset-server, reset-both) Note: Not all options are available on all PAN-OS versions.
-      - log_setting                                       # (str) – Log forwarding profile
-      - log_start                                         # (bool) – Log at session start
-      - log_end                                           # (bool) – Log at session end
-      - description                                       # (str) – Description of this rule
-      - type                                              # (str) – ‘universal’, ‘intrazone’, or ‘intrazone’ (Default: universal)
-      - tag                                               # (list) – Administrative tags
-      - negate_source                                     # (bool) – Match on the reverse of the ‘source’ attribute
-      - negate_destination                                # (bool) – Match on the reverse of the ‘destination’ attribute
-      - disabled                                          # (bool) – Disable this rule
-      - schedule                                          # (str) – Schedule Profile
-      - icmp_unreachable                                  # (bool) – Send ICMP Unreachable
-      - disable_server_response_inspection                # (bool) – Disable server response inspection
-      - group                                             # (str) – Security Profile Group
-      - virus                                             # (str) – Antivirus Security Profile
-      - spyware                                           # (str) – Anti-Spyware Security Profile
-      - vulnerability                                     # (str) – Vulnerability Protection Security Profile
-      - url_filtering                                     # (str) – URL Filtering Security Profile
-      - file_blocking                                     # (str) – File Blocking Security Profile
-      - wildfire_analysis                                 # (str) – Wildfire Analysis Security Profile
-      - data_filtering                                    # (str) – Data Filtering Security Profile
-      - negate_target                                     # (bool) – Target all but the listed target firewalls (applies to panorama/device groups only)
-      - target                                            # (list) – Apply this policy to the listed firewalls only (applies to panorama/device groups only)
-      - uuid                                              # (str) – (PAN-OS 9.0+) The UUID for this rule.
+      - name                                                # (str) – Name of profile
+      - priority                                            # (int) – Priority id
+      - action                                              # (str) – ‘no-redist’ or ‘redist’
+      - filter_type                                         # (tuple) – Any of ‘static’, ‘connect’, ‘rip’, ‘ospf’, or ‘bgp’
+      - filter_interface                                    # (tuple) – Filter interface
+      - filter_destination                                  # (tuple) – Filter destination
+      - filter_nexthop                                      # (tuple) – Filter nexthop
+      - ospf_filter_pathtype                                # (tuple) – Any of ‘intra-area’, ‘inter-area’, ‘ext-1’, or ‘ext-2
+      - ospf_filter_area                                    # (tuple) – OSPF filter on area
+      - ospf_filter_tag                                     # (tuple) – OSPF filter on tag
+      - bgp_filter_community                                # (tuple) – BGP filter on community
+      - bgp_filter_extended_community                       # (tuple) – BGP filter on extended community
+  redistribution_profile_v6:
+    module: panos.network
+    class: RedistributionProfileIPv6
+    sort_param: name
+    params:
+      - name                                                # (str) – Name of profile
+      - priority                                            # (int) – Priority id
+      - action                                              # (str) – ‘no-redist’ or ‘redist’
+      - filter_type                                         # (tuple) – Any of ‘static’, ‘connect’, ‘rip’, ‘ospf’, or ‘bgp’
+      - filter_interface                                    # (tuple) – Filter interface
+      - filter_destination                                  # (tuple) – Filter destination
+      - filter_nexthop                                      # (tuple) – Filter nexthop
+      - ospf_filter_pathtype                                # (tuple) – Any of ‘intra-area’, ‘inter-area’, ‘ext-1’, or ‘ext-2
+      - ospf_filter_area                                    # (tuple) – OSPF filter on area
+      - ospf_filter_tag                                     # (tuple) – OSPF filter on tag
+      - bgp_filter_community                                # (tuple) – BGP filter on community
+      - bgp_filter_extended_community                       # (tuple) – BGP filter on extended community
+  snmp_v2c_server:
+    module: panos.device
+    class: SnmpV2cServer
+    sort_param: name
+    params:
+      - name                                                # (str) – The name
+      - manager                                             # (str) – IP address or FQDN of SNMP manager to use
+      - community                                           # (str) – SNMP community
+  snmp_v3_server:
+    module: panos.device
+    class: SnmpV3Server
+    sort_param: name
+    params:
+      - name                                                # (str) – The name
+      - manager                                             # (str) – IP address or FQDN of SNMP manager to use
+      - user                                                # (str) – User
+      - engine_id                                           # (str) – A hex number
+      - auth_password                                       # (str) – Authentication protocol password
+      - priv_password                                       # (str) – Privacy protocol password
+  static_mac:
+    module: panos.network
+    class: ManagementProfile
+    sort_param: name
+    params:
+      - mac                                                 # (str) - Static MAC
+      - interface                                           # (str) - Interface
+  static_route_v4:
+    module: panos.network
+    class: StaticRoute
+    sort_param: name
+    params:
+      - name                                                # (str) – The name
+      - destination                                         # (str) – Destination network
+      - nexthop_type                                        # (str) – ip-address, discard, or next-vr
+      - nexthop                                             # (str) – Next hop IP address or Next VR Name
+      - interface                                           # (str) – Next hop interface
+      - admin_dist                                          # (str) – Administrative distance
+      - metric                                              # (int) – Metric (Default: 10)
+      - enable_path_monitor                                 # (bool) – Enable Path Monitor
+      - failure_condition                                   # (str) – Path Monitor failure condition set ‘any’ or ‘all’
+      - preemptive_hold_time                                # (int) – Path Monitor Preemptive Hold Time in minutes
+  static_route_v6:
+    module: panos.network
+    class: StaticRouteV6
+    sort_param: name
+    params:
+      - name                                                # (str) – The name
+      - destination                                         # (str) – Destination network
+      - nexthop_type                                        # (str) – ip-address, discard, or next-vr
+      - nexthop                                             # (str) – Next hop IP address or Next VR Name
+      - interface                                           # (str) – Next hop interface
+      - admin_dist                                          # (str) – Administrative distance
+      - metric                                              # (int) – Metric (Default: 10)
+      - enable_path_monitor                                 # (bool) – Enable Path Monitor
+      - failure_condition                                   # (str) – Path Monitor failure condition set ‘any’ or ‘all’
+      - preemptive_hold_time                                # (int) – Path Monitor Preemptive Hold Time in minutes
+  syslog_server:
+    module: panos.device
+    class: SyslogServer
+    sort_param: name
+    params:
+      - name                                                # (str) – The name
+      - server                                              # (str) – IP address or FQDN of the syslog server
+      - transport                                           # (str) – Syslog transport. Valid values are UDP (default), TCP, or SSL.
+      - port                                                # (int) – Syslog port number.
+      - format                                              # (str) – Format of the syslog message. Valid values are BSD (default) or IETF.
+      - facility                                            # (str) – Syslog facility. Valid values are LOG_USER (default), or LOG_LOCAL0 through LOG_LOCAL7.
+  telemetry:
+    module: panos.device
+    class: Telemetry
+    params:
+      - app_reports                                         # (bool) – Application reports
+      - threat_reports                                      # (bool) – Threat preventioin reports
+      - url_reports                                         # (bool) – URL reports
+      - file_type_reports                                   # (bool) – File type identification reports
+      - threat_data                                         # (bool) – Threat prevention data
+      - threat_pcaps                                        # (bool) – Enable sending packet captures with threat prevention information. This requires that “threat_data” also be enabled.
+      - product_usage_stats                                 # (bool) – Health and performance reports
+      - passive_dns_monitoring                              # (bool) – Passive DNS monitoring
