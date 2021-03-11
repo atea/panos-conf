@@ -287,3 +287,16 @@ class Utilities:
       return unsorted_list
     else:
       return sorted(unsorted_list, key=lambda k: k[sort_param])
+
+  def get_hostname_vsys(self, hostname):
+    vsys_file = f"{ self.get_config_dir() }/hosts/{ hostname }"
+    vsys_file += f"/vsys1/device_vsys.yml"
+    
+    if os.path.exists(vsys_file):
+      vsys_config = self.yaml_from_file(vsys_file)
+      vsys_list = []
+      for vsys in vsys_config:
+        vsys_list.append(vsys['name'])
+      return vsys_list
+    else:
+      return ['vsys1']

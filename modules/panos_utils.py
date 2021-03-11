@@ -45,24 +45,23 @@ class PanosUtils:
 
   def get_configs_from_all_firewalls(self, return_object=False):
     fw_configs = {}
-    for hostname, args in self.utils.config['panos']['hosts'].items():
-      for vsys in args['vsys']:
+    for host in self.utils.config['hosts']:
+      vsys_list = self.utils.get_hostname_vsys(host['hostname'])
+      for vsys in vsys_list:
         conn = {
-          "hostname": hostname,
-          "args": args,
+          "hostname": host['hostname'],
+          "host_args": host,
           "add": False,
           "return_object": return_object
         }
-        # TODO: temporary workaround until we figure out proper vsys support
-        # TODO: we should also use the device_vsys config somehow?
-        # TODO: maybe bootstrap it somehow? (i.e. if file not defined, then assume "None")
-        if (len(args['vsys']) < 2) and (vsys == 'vsys1'):
+        if (len(vsys_list) < 2) and (vsys == 'vsys1'):
           # on device that only has one vsys
           conn_vsys = None
         else:
           conn_vsys = vsys
         
-        vsys_conn = self.connect_to_fw(hostname, conn_vsys, conn['args'])
+        vsys_conn = self.connect_to_fw(host['hostname'], conn_vsys, 
+                                       conn['host_args'])
         if vsys_conn is None:
           continue
         conn['vsys'] = vsys_conn
@@ -70,10 +69,10 @@ class PanosUtils:
         conn['vsys'].add(conn['rulebase'])
 
         fw_config = self.get_modules_from_firewall(conn)
-        fw_configs[hostname] = {}
-        fw_configs[hostname][vsys] = {}
-        fw_configs[hostname][vsys]['conn'] = conn
-        fw_configs[hostname][vsys]['config_modules'] = fw_config
+        fw_configs[host['hostname']] = {}
+        fw_configs[host['hostname']][vsys] = {}
+        fw_configs[host['hostname']][vsys]['conn'] = conn
+        fw_configs[host['hostname']][vsys]['config_modules'] = fw_config
     return fw_configs
 
   def get_modules_from_firewall(self, conn):
