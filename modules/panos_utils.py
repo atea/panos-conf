@@ -138,7 +138,7 @@ class PanosUtils:
   def get_object_children(self, obj, object_info):
     children_dict = {}
     children = getattr(obj, 'children', [])
-    for child_obj in children:     
+    for child_obj in children:
       for child_conf in object_info['children']:
         child_name = child_conf['name']
         child_conf_info = self.utils.api_params['children'][child_name]

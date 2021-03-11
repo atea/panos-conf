@@ -30,9 +30,13 @@ class Utilities:
   def init(self):
     self.start = self.datetime_now()
     self.config = self.yaml_from_file(
-        self.get_filepath('/configs/panos-conf.yml'))
+        self.get_filepath_config('panos-conf.yml'))
     self.api_params = self.yaml_from_file(
-        self.get_filepath('/configs/panos-api-parameters.yml'))
+        self.get_filepath_config(
+            'panos-api-parameters.yml',
+            'panos-api-parameters.yml.dist'
+        )
+    )
     self.log = self.create_logger()
 
   def get_work_dir(self):
@@ -41,9 +45,21 @@ class Utilities:
   def get_config_dir(self):
     return self.get_work_dir() + '/configs'
 
-  def get_filepath(self, file):
-    return self.get_work_dir() + file
-  
+  def get_log_dir(self):
+    return self.get_work_dir() + '/logs'
+
+  def get_filepath(self, directory, files):
+    for file in files:
+      filepath = directory + '/' + file
+      if os.path.exists(filepath):
+        return filepath
+
+  def get_filepath_config(self, *files):
+    return self.get_filepath(self.get_config_dir(), files)
+
+  def get_filepath_log(self, *files):
+    return self.get_filepath(self.get_log_dir(), files)
+
   def create_config_folder(self, subdirs):
     conf_dir = f"{ self.get_config_dir() }/hosts/{ subdirs }"
     if not os.path.exists(conf_dir):
@@ -132,7 +148,7 @@ class Utilities:
     
   def create_logger_file_handler(self, formatter, level=logging.DEBUG):
     file_handler = logging.handlers.TimedRotatingFileHandler(
-      filename = self.get_filepath('/logs/panos-conf.log'),
+      filename = self.get_filepath_log('panos-conf.log'),
       when = 'midnight', interval=1, backupCount = 0)
     file_handler.setLevel(level)
     file_handler.setFormatter(formatter)
