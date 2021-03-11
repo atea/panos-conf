@@ -11,10 +11,10 @@ configuration is stored as separate YAML files.
   - Policies (NAT rules, PBF, and security rules)
   - Device (Admin users, system settings, etc)
   - Network (Interfaces, tunnels, zones, virtual routers, etc)
-* Store API key in system keyring (where supported)
+* Encrypts per-device API keys (similar to `ansible-vault encrypt_string`)
+* Password for encryption stored in keyring or entered manually on each run
 
 ## Roadmap:
-* Encrypt per-device API keys (similar to `ansible-vault encrypt_string`)
 * Push configuration to PANOS devices based on YAML
 * Push files to PANOS devices (certificates, etc)
 
