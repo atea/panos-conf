@@ -1,10 +1,14 @@
+---
+
 settings:
   skip_null_param: true
+  ssl_verify: true
   keyring:
+    enabled: enable
     service: system
-    username: panos-conf_apikey
+    username: panos-conf_crypto-password
 
 hosts:
-  - hostname: foo.example.com
-  - hostname: bar.example.com
-    api_key: secret-api-key
+- hostname: foo.example.com
+- hostname: bar.example.com
+  api_key: secret-api-key

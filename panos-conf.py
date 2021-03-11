@@ -16,14 +16,19 @@ def parse_arguments():
   parser = argparse.ArgumentParser(description='PAN-OS configuration utility')  
   subparsers = parser.add_subparsers()
   
-  # set/get api key
+  # set/get api keys
   api_key = subparsers.add_parser('apikey', help='configure apikey')
   api_key.set_defaults(func=api_key_cmd)
-  api_key_group = api_key.add_mutually_exclusive_group(required=True)
-  api_key_group.add_argument('--set', action='store_true',
+  api_key.add_argument('--set', action='store_true', required=True,
       help="set the api key")
-  api_key_group.add_argument('--get', action='store_true',
-      help="get the api key")
+  api_key.add_argument('--force', action='store_true',
+      help="force set the api key")
+
+  # set keyring password
+  keyring = subparsers.add_parser('keyring', help='configure keyring')
+  keyring.set_defaults(func=keyring_cmd)
+  keyring.add_argument('--set', action='store_true', required=True,
+      help="set the keyring password")
 
   # generate yaml config based on current config
   get_yaml = subparsers.add_parser('getyaml', help='get yaml config')
@@ -44,9 +49,11 @@ def parse_arguments():
 
 def api_key_cmd(args):
   if args.set:
-    utils.set_api_key()
-  if args.get:
-    print(f"apikey: { utils.get_api_key() }")
+    panos_utils.set_api_key(args.force)
+
+def keyring_cmd(args):
+  if args.set:
+    utils.set_keyring_password()
 
 def get_yaml_cmd(args):
   if args.all:

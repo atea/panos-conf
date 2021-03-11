@@ -1,3 +1,5 @@
+cryptography
 keyring
 pan-os-python
 pyyaml
+requests

@@ -1,16 +1,21 @@
 #!/usr/bin/env python3
 
+import base64
 import importlib
 import json
 import keyring
 import logging, logging.handlers
 import os
 import re
+import requests
 import sys
 import time
 import yaml
 from collections import OrderedDict
 from copy import deepcopy
+from cryptography.fernet import Fernet
+from cryptography.hazmat.primitives import hashes
+from cryptography.hazmat.primitives.kdf.pbkdf2 import PBKDF2HMAC
 from datetime import datetime
 from getpass import getpass
 
@@ -22,6 +27,13 @@ class YamlDumper(yaml.SafeDumper):
       super().write_line_break()
 
 class Utilities:
+  _config_file = 'panos-conf.yml'
+  _log_file = 'panos-conf.log'
+  _api_params_file = [
+    'panos-api-parameters.yml',
+    'panos-api-parameters.yml.dist'
+  ]
+  
   def __init__(self, **kwargs):
     if not kwargs == None:
       for key, value in kwargs.items():
@@ -30,12 +42,10 @@ class Utilities:
   def init(self):
     self.start = self.datetime_now()
     self.config = self.yaml_from_file(
-        self.get_filepath_config('panos-conf.yml'))
+        self.get_filepath_config(self._config_file)
+    )
     self.api_params = self.yaml_from_file(
-        self.get_filepath_config(
-            'panos-api-parameters.yml',
-            'panos-api-parameters.yml.dist'
-        )
+        self.get_filepath_config(self._api_params_file)
     )
     self.log = self.create_logger()
 
@@ -49,18 +59,21 @@ class Utilities:
     return self.get_work_dir() + '/logs'
 
   def get_filepath(self, directory, files):
+    if not isinstance(files, list):
+      files = [files]
+    
     for file in files:
       filepath = directory + '/' + file
       if os.path.exists(filepath):
         return filepath
 
-  def get_filepath_config(self, *files):
+  def get_filepath_config(self, files):
     return self.get_filepath(self.get_config_dir(), files)
 
-  def get_filepath_log(self, *files):
+  def get_filepath_log(self, files):
     return self.get_filepath(self.get_log_dir(), files)
 
-  def create_config_folder(self, subdirs):
+  def create_host_folder(self, subdirs):
     conf_dir = f"{ self.get_config_dir() }/hosts/{ subdirs }"
     if not os.path.exists(conf_dir):
       os.makedirs(conf_dir)
@@ -148,7 +161,7 @@ class Utilities:
     
   def create_logger_file_handler(self, formatter, level=logging.DEBUG):
     file_handler = logging.handlers.TimedRotatingFileHandler(
-      filename = self.get_filepath_log('panos-conf.log'),
+      filename = self.get_filepath_log(self._log_file),
       when = 'midnight', interval=1, backupCount = 0)
     file_handler.setLevel(level)
     file_handler.setFormatter(formatter)
@@ -239,45 +252,12 @@ class Utilities:
         'default': total_duration()
     }[interval]
 
-  def set_api_key(self):
-    api_key_one = getpass("Enter API key: ")
-    api_key_two = getpass("Enter API key again: ")
-    if api_key_one == api_key_two:
-      keyring.set_password(
-        self.config['settings']['keyring']['service'],
-        self.config['settings']['keyring']['username'],
-        api_key_one
-      )
-      self.log.info("API key set.")
-    else:
-      self.log.error("API keys does not match.")
+  def write_config_file(self):
+    config_file = self.get_filepath_config(self._config_file)
+    self.yaml_to_file(config_file, self.config, force_overwrite=True)
 
-  def get_api_key(self, args=None):
-    if args is None:
-      return self.get_api_key_keyring()
-    else:
-      return self.get_api_key_config(args)
-
-  def get_api_key_keyring(self):
-    try:
-      api_key = keyring.get_password(
-        self.config['settings']['keyring']['service'],
-        self.config['settings']['keyring']['username']
-      )
-    except:
-      self.log.error("API key not set.")
-      sys.exit(1)
-    else:
-      return api_key
-
-  def get_api_key_config(self, args):
-    if args.get('api_key', False):
-      return args['api_key']
-    else:
-      return self.get_api_key_keyring()
-
-  def write_config_file(self, data, file_params, yaml_flow=False):
-    conf_dir = self.create_config_folder(file_params['conf_dir'])
+  def write_host_config_file(self, data, file_params, yaml_flow=False):
+    conf_dir = self.create_host_folder(file_params['conf_dir'])
     conf_file = conf_dir + '/' + file_params['filename'] + '.yml'
     self.yaml_to_file(conf_file, data,
                       file_params['force_overwrite'], yaml_flow)
@@ -300,3 +280,107 @@ class Utilities:
       return vsys_list
     else:
       return ['vsys1']
+
+  def ask_for_credentials(self, user_description, password_description):
+    username = input(f"{ user_description }: ")
+    password = self.get_password(password_description)
+
+    return username, password
+  
+  def get_password(self, description="password", verify=False):
+    if verify:
+      while True:
+        password_one = getpass(f"Enter { description }: ")
+        password_two = getpass(f"Verify { description }: ")
+        
+        if password_one == password_two:
+          return password_one
+        else:
+          print("Not matching. Please try again.")
+    else:
+      password = getpass(f"Enter { description }: ")
+      return password
+
+  def set_or_get_salt(self):
+    salt = self.config['settings'].get('crypto_salt', None)
+    if salt is None:
+      self.config['settings']['crypto_salt'] = os.urandom(16)
+      self.write_config_file()
+      return self.config['settings']['crypto_salt']
+    else:
+      return salt
+
+  def set_or_get_crypto(self):
+    crypto = getattr(self, 'crypto', None)
+    if crypto is None:
+      password = self.get_crypto_password()
+      salt = self.set_or_get_salt()
+      kdf = PBKDF2HMAC(
+          algorithm = hashes.SHA256(),
+          length = 32,
+          salt = salt,
+          iterations = 100000,
+      )
+      key = base64.urlsafe_b64encode(kdf.derive(password))
+      self.crypto = Fernet(key)
+      return self.crypto
+    else:
+      return crypto
+
+  def get_crypto_password(self):
+    if self.keyring_enabled():
+      try:
+        password = keyring.get_password(
+          self.config['settings']['keyring']['service'],
+          self.config['settings']['keyring']['username']
+        )
+      except:
+        return self.set_keyring_password().encode()
+      else:
+        if password is None:
+          return self.set_keyring_password().encode()
+        else:
+          return password.encode()
+    else:
+      password = self.get_password(description="encryption password")
+      return password.encode()
+
+  def set_keyring_password(self):
+    password = self.get_password(verify=True)
+    keyring.set_password(
+      self.config['settings']['keyring']['service'],
+      self.config['settings']['keyring']['username'],
+      password
+    )
+    return password
+
+  def keyring_enabled(self):
+    return self.config.get(
+        'settings', False).get(
+        'keyring', False).get(
+        'enabled', False)
+
+  def get_api_key_config(self, args):
+    if args.get('api_key', False):
+      return args['api_key']
+    else:
+      return self.get_api_key_keyring()
+
+  def encrypt(self, data):
+    crypto = self.set_or_get_crypto()
+    return crypto.encrypt(data.encode())
+
+  def decrypt(self, data):
+    crypto = self.set_or_get_crypto()
+    return crypto.decrypt(data).decode()
+
+  def url_post(self, url, data):
+    verify = self.config.get('settings', True).get('ssl_verify', True)
+    try:
+      response = requests.post(url, data=data, verify=verify)
+    except Exception as e:
+      print(e)
+      return None
+    else:
+      return response
+    

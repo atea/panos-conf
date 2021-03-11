@@ -5,6 +5,7 @@ import panos.device
 import panos.firewall
 import panos.objects
 import panos.policies
+import xml.etree.ElementTree as etree
 
 class PanosUtils:
   def __init__(self, **kwargs):
@@ -16,7 +17,7 @@ class PanosUtils:
     try:
       fw = panos.firewall.Firewall(
         hostname = hostname,
-        api_key = self.utils.get_api_key(args),
+        api_key = self.get_api_key(args),
         vsys = vsys
       )
     except:
@@ -41,11 +42,14 @@ class PanosUtils:
             data = modules[module][object_type]
             if len(data) > 0:
               # don't write blank configs
-              self.utils.write_config_file(data, file_params)
+              self.utils.write_host_config_file(data, file_params)
 
   def get_configs_from_all_firewalls(self, return_object=False):
     fw_configs = {}
     for host in self.utils.config['hosts']:
+      if host.get('api_key', None) is None:
+        continue
+        
       vsys_list = self.utils.get_hostname_vsys(host['hostname'])
       for vsys in vsys_list:
         conn = {
@@ -161,3 +165,73 @@ class PanosUtils:
               children_dict[child_conf['name']], child_conf_info['sort_param'])
 
     return children_dict
+
+  def set_api_key(self, force):
+    # get credentials
+    api_user, api_password = self.utils.ask_for_credentials(
+        "Enter API username", "API password"
+    )
+    
+    # iterate through hosts
+    for host in self.utils.config['hosts']:
+      api_key = host.get('api_key', None)
+      
+      if force or api_key is None:
+        # set api_key
+        api_key = self.create_api_key(host['hostname'], api_user, api_password)
+        host['api_key'] = self.utils.encrypt(api_key)
+      else:
+        # api_key already set
+        continue
+
+    # write config
+    self.utils.write_config_file()
+
+  def create_api_key(self, hostname, api_user, api_password):
+    if (api_user is None or api_password is None):
+      return None
+    
+    query = {
+      'type': 'keygen',
+      'user': api_user,
+      'password': api_password,
+    }
+    
+    response = self.api_request(hostname, query)
+
+    if response is not None:
+      if response.status_code == 200:      
+        return self.get_api_key_from_xml(response.text)
+      else:
+        return None
+    else:
+      return None
+
+  def get_api_key_from_xml(self, xml):
+    xml_root = etree.fromstring(xml)
+    if xml_root is None:
+      return xml_root
+    
+    xml_result = xml_root.find('result')
+    if xml_result is None:
+      return xml_result
+    
+    api_key = xml_result.find('key')
+    if api_key is None:
+      return None
+    
+    return api_key.text
+
+  def api_request(self, hostname, query):
+    url = f"https://{ hostname }/api/"
+    return self.utils.url_post(url, query)
+
+  def get_api_key(self, args):
+    api_key = args.get('api_key', None)
+    if api_key is None:
+      return api_key
+    else:
+      if isinstance(api_key, bytes):
+        return self.utils.decrypt(api_key)
+      else:
+        return api_key
