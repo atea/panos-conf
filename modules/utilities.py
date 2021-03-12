@@ -320,40 +320,48 @@ class Utilities:
   def set_or_get_crypto(self):
     crypto = getattr(self, 'crypto', None)
     if crypto is None:
-      password = self.get_crypto_password()
-      salt = self.set_or_get_salt()
-      kdf = PBKDF2HMAC(
-          algorithm = hashes.SHA256(),
-          length = 32,
-          salt = salt,
-          iterations = 100000,
-      )
-      key = base64.urlsafe_b64encode(kdf.derive(password))
-      self.crypto = Fernet(key)
-      return self.crypto
+      return self.create_crypto()
     else:
       return crypto
 
+  def create_crypto(self, password=None):
+    if password is None:
+      password = self.get_crypto_password()
+    salt = self.set_or_get_salt()
+    kdf = PBKDF2HMAC(
+        algorithm = hashes.SHA256(),
+        length = 32,
+        salt = salt,
+        iterations = 100000,
+    )
+    key = base64.urlsafe_b64encode(kdf.derive(password.encode()))
+    return Fernet(key)
+
   def get_crypto_password(self):
     if self.keyring_enabled():
-      try:
-        password = keyring.get_password(
-          self.config['settings']['keyring']['service'],
-          self.config['settings']['keyring']['username']
-        )
-      except:
-        return self.set_keyring_password().encode()
-      else:
-        if password is None:
-          return self.set_keyring_password().encode()
-        else:
-          return password.encode()
-    else:
-      password = self.get_password(description="encryption password")
-      return password.encode()
+      password = self.get_keyring_password()
 
-  def set_keyring_password(self):
-    password = self.get_password(verify=True)
+      if password is None:
+        return self.set_keyring_password()
+      else:
+        return password
+    else:
+      return self.get_password(description="encryption password")
+
+  def get_keyring_password(self):
+    try:
+      password = keyring.get_password(
+        self.config['settings']['keyring']['service'],
+        self.config['settings']['keyring']['username']
+      )
+    except Exception as e:
+      return None
+    else:
+      return password
+
+  def set_keyring_password(self, password=None):
+    if password is None:
+      password = self.get_password(verify=True)
     keyring.set_password(
       self.config['settings']['keyring']['service'],
       self.config['settings']['keyring']['username'],
@@ -361,18 +369,45 @@ class Utilities:
     )
     return password
 
+  def change_password(self):
+    current_password = self.get_crypto_password()
+    new_password = self.get_password(description="new encryption password",
+                                     verify=True)
+    if current_password == new_password:
+      print("Old and new passwords are identical. Doing nothing.")
+    else:
+      self.reencrypt_api_keys(current_password, new_password)
+      
+      if self.keyring_enabled():
+        self.set_keyring_password(new_password)
+
+  def reencrypt_api_keys(self, old_password, new_password):
+    old_crypto = self.create_crypto(old_password)
+    new_crypto = self.create_crypto(new_password)
+
+    for host in self.config['hosts']:
+      api_key = host.get('api_key', None)
+      if api_key is not None:
+        decrypted_api_key = self.decrypt(api_key, old_crypto)
+        host['api_key'] = self.encrypt(decrypted_api_key, new_crypto)
+
+    # write config
+    self.write_config_file()
+  
   def keyring_enabled(self):
     return self.config.get(
         'settings', False).get(
         'keyring', False).get(
         'enabled', False)
 
-  def encrypt(self, data):
-    crypto = self.set_or_get_crypto()
+  def encrypt(self, data, crypto=None):
+    if crypto is None:
+      crypto = self.set_or_get_crypto()
     return crypto.encrypt(data.encode())
 
-  def decrypt(self, data):
-    crypto = self.set_or_get_crypto()
+  def decrypt(self, data, crypto=None):
+    if crypto is None:
+      crypto = self.set_or_get_crypto()
     return crypto.decrypt(data).decode()
 
   def url_post(self, url, data):
