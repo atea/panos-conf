@@ -1,9 +1,7 @@
 # panos-conf
 
-PAN-OS configuration utility.
-
-Currently let's you fetch configuration from one or more PANOS devices. The
-configuration is stored as separate YAML files.
+PAN-OS configuration utility. Fetch and/or push configuration from one or more
+PANOS devices. Configuration is stored per host in individual YAML files.
 
 ## Features
 * Fetch configuration of the following types, and store as YAML:
