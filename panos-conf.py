@@ -21,9 +21,12 @@ def parse_arguments():
   api_key.set_defaults(func=api_key_cmd)
   api_key.add_argument('--set', action='store_true', required=True,
       help="set the api key")
-  api_key.add_argument('--force', action='store_true',
+  api_key_group = api_key.add_mutually_exclusive_group()
+  api_key_group.add_argument('--force', action='store_true',
       help="force set the api key")
-
+  api_key_group.add_argument('--verify', action='store_true',
+      help="verify the api keys, and set were needed")
+  
   # set keyring password
   keyring = subparsers.add_parser('keyring', help='configure keyring')
   keyring.set_defaults(func=keyring_cmd)
@@ -49,7 +52,7 @@ def parse_arguments():
 
 def api_key_cmd(args):
   if args.set:
-    panos_utils.set_api_key(args.force)
+    panos_utils.set_api_keys(force=args.force, verify=args.verify)
 
 def keyring_cmd(args):
   if args.set:

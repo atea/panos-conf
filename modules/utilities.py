@@ -49,6 +49,13 @@ class Utilities:
     )
     self.log = self.create_logger()
 
+    # disable insecure warnings if ssl_verify=false
+    ssl_verify = self.config.get('settings', True).get('ssl_verify', True)
+    if not ssl_verify:
+      requests.packages.urllib3.disable_warnings(
+        requests.packages.urllib3.exceptions.InsecureRequestWarning
+      )
+
   def get_work_dir(self):
     return self.work_dir
 
@@ -360,12 +367,6 @@ class Utilities:
         'keyring', False).get(
         'enabled', False)
 
-  def get_api_key_config(self, args):
-    if args.get('api_key', False):
-      return args['api_key']
-    else:
-      return self.get_api_key_keyring()
-
   def encrypt(self, data):
     crypto = self.set_or_get_crypto()
     return crypto.encrypt(data.encode())
@@ -375,9 +376,9 @@ class Utilities:
     return crypto.decrypt(data).decode()
 
   def url_post(self, url, data):
-    verify = self.config.get('settings', True).get('ssl_verify', True)
+    ssl_verify = self.config.get('settings', True).get('ssl_verify', True)
     try:
-      response = requests.post(url, data=data, verify=verify)
+      response = requests.post(url, data=data, verify=ssl_verify)
     except Exception as e:
       print(e)
       return None

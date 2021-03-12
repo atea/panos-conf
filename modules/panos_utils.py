@@ -13,16 +13,17 @@ class PanosUtils:
       for key, value in kwargs.items():
         setattr(self, key, value)
     
-  def connect_to_fw(self, hostname, vsys=None, args=None):
+  def connect_to_fw(self, hostname, api_key, vsys=None):
     try:
       fw = panos.firewall.Firewall(
         hostname = hostname,
-        api_key = self.get_api_key(args),
+        api_key = api_key,
         vsys = vsys
       )
-    except:
-      self.utils.log.error("Could not connect to firewall.")
-      return None
+      fw.refresh_system_info()
+    except Exception as e:
+      self.utils.log.error(f"Could not connect to firewall: { e }")
+      raise(e)
     else:
       return fw
 
@@ -47,11 +48,13 @@ class PanosUtils:
   def get_configs_from_all_firewalls(self, return_object=False):
     fw_configs = {}
     for host in self.utils.config['hosts']:
+      self.utils.log.info(f"Getting config for host: { host['hostname'] }")
       if host.get('api_key', None) is None:
         continue
-        
+
       vsys_list = self.utils.get_hostname_vsys(host['hostname'])
       for vsys in vsys_list:
+        self.utils.log.info(f"Getting config for vsys: { vsys }")
         conn = {
           "hostname": host['hostname'],
           "host_args": host,
@@ -64,10 +67,13 @@ class PanosUtils:
         else:
           conn_vsys = vsys
         
-        vsys_conn = self.connect_to_fw(host['hostname'], conn_vsys, 
-                                       conn['host_args'])
-        if vsys_conn is None:
+        try:
+          vsys_conn = self.connect_to_fw(host['hostname'],
+                                         self.fix_api_key(host['api_key']),
+                                         conn_vsys)
+        except:
           continue
+
         conn['vsys'] = vsys_conn
         conn['rulebase'] = panos.policies.Rulebase()
         conn['vsys'].add(conn['rulebase'])
@@ -83,6 +89,7 @@ class PanosUtils:
     modules = self.utils.api_params['modules']
     modules_config = {}
     for module in modules:
+      self.utils.log.debug(f"Getting module config for: { module }")
       modules_config[module] = self.get_objects_from_firewall(conn, 
                                                               modules[module])
     return modules_config
@@ -166,7 +173,7 @@ class PanosUtils:
 
     return children_dict
 
-  def set_api_key(self, force):
+  def set_api_keys(self, force=False, verify=False, hostname=None):
     # get credentials
     api_user, api_password = self.utils.ask_for_credentials(
         "Enter API username", "API password"
@@ -174,18 +181,35 @@ class PanosUtils:
     
     # iterate through hosts
     for host in self.utils.config['hosts']:
+      if hostname is not None:
+        if hostname != host['hostname']:
+          continue
+
+      self.utils.log.info(f"Setting API key for host: { host['hostname'] }")
       api_key = host.get('api_key', None)
-      
+
       if force or api_key is None:
-        # set api_key
-        api_key = self.create_api_key(host['hostname'], api_user, api_password)
-        host['api_key'] = self.utils.encrypt(api_key)
+        self.set_api_key(host, api_user, api_password)
       else:
         # api_key already set
-        continue
+        if verify:
+          try:
+            fw = self.connect_to_fw(host['hostname'], 
+                                    self.fix_api_key(api_key))
+          except:
+            self.set_api_key(host, api_user, api_password)
+          else:
+            continue
+        else:
+          continue
 
     # write config
     self.utils.write_config_file()
+
+  def set_api_key(self, host_info, api_user, api_password):
+    api_key = self.create_api_key(host_info['hostname'], api_user, 
+                                  api_password)
+    host_info['api_key'] = self.utils.encrypt(api_key)
 
   def create_api_key(self, hostname, api_user, api_password):
     if (api_user is None or api_password is None):
@@ -226,12 +250,8 @@ class PanosUtils:
     url = f"https://{ hostname }/api/"
     return self.utils.url_post(url, query)
 
-  def get_api_key(self, args):
-    api_key = args.get('api_key', None)
-    if api_key is None:
-      return api_key
+  def fix_api_key(self, api_key):
+    if isinstance(api_key, bytes):
+      return self.utils.decrypt(api_key)
     else:
-      if isinstance(api_key, bytes):
-        return self.utils.decrypt(api_key)
-      else:
-        return api_key
+      return api_key
