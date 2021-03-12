@@ -13,6 +13,8 @@ configuration is stored as separate YAML files.
   - Network (Interfaces, tunnels, zones, virtual routers, etc)
 * Encrypts per-device API keys (similar to `ansible-vault encrypt_string`)
 * Password for encryption stored in keyring or entered manually on each run
+* Re-encrypt API-keys upon password change
+* Verify stored API-keys; create new ones if invalid
 
 ## Roadmap:
 * Push configuration to PANOS devices based on YAML
